@@ -7,6 +7,8 @@ import util.MomentIterator;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.lang.Thread.Builder;
+import java.util.ArrayList;
 import java.util.List;
 
 public class Program {
@@ -46,34 +48,37 @@ public class Program {
 
         Runnable secondTask = () -> InterpolationService.exportInterpolation(new MomentIterator("01/01/2021", "31/12/2023"), locations.subList(locations.size() / 3, locations.size() / 3 * 2));
 
-        Runnable thirdTask = () -> InterpolationService.exportInterpolation(new MomentIterator("01/01/2021", "31/12/2023"), locations.subList(locations.size() / 3 * 2, locations.size())));
+        Runnable thirdTask = () -> InterpolationService.exportInterpolation(new MomentIterator("01/01/2021", "31/12/2023"), locations.subList(locations.size() / 3 * 2, locations.size()));
 
-        Thread.Builder builder1 = Thread.ofVirtual().name("worker-", 0);
-        Thread.Builder builder2 = Thread.ofVirtual().name("worker-", 1);
-        Thread.Builder builder3 = Thread.ofVirtual().name("worker-", 2);
-
-        Thread db1 = builder1.start(firstDatabase);
-        Thread db2 = builder2.start(secondDatabase);
-        Thread db3 = builder3.start(thirdDatabase);
-
-        db1.join();
-        db2.join();
-        db3.join();
+        runThreads(List.of(firstDatabase, secondDatabase, thirdDatabase));
 
         long checkpoint2 = System.currentTimeMillis();
 
-        Thread t1 = builder1.start(firstTask);
-        Thread t2 = builder2.start(secondTask);
-        Thread t3 = builder3.start(thirdTask);
-
-        t1.join();
-        t2.join();
-        t3.join();
+        runThreads(List.of(firstTask, secondTask, thirdTask));
 
         long checkpoint3 = System.currentTimeMillis();
 
         System.out.printf("Time to read the database: %.3fs%n", (checkpoint2 - checkpoint1) / 1e3);
         System.out.printf("Time to export the required locations: %.3fs%n", (checkpoint3 - checkpoint2) / 1e3);
         System.out.printf("Total time: %.3fs%n", (checkpoint3 - checkpoint1) / 1e3);
+    }
+
+    private static void runThreads(List<Runnable> runnables) throws InterruptedException {
+        runThreads(runnables, Thread.MIN_PRIORITY);
+    }
+
+    private static void runThreads(List<Runnable> runnables, int priority) throws InterruptedException {
+        List<Thread> threads = new ArrayList<>();
+
+        for(int i = 0; i < runnables.size(); i++){
+            Builder builder = Thread.ofVirtual().name("worker-", i);
+
+            threads.add(builder.start(runnables.get(i)));
+        }
+
+        for(Thread thread : threads){
+            thread.setPriority(priority);
+            thread.join();
+        }
     }
 }

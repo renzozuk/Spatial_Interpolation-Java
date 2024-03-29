@@ -56,7 +56,7 @@ public class InterpolationService {
 
             FileManagementService.exportInterpolation(interpolation);
 
-            System.out.println("Interpolation [" + interpolation.getMainTemperatureMeasurement().getPoint().getName() + "] [" + interpolation.getMoment() + "] exported successfully.");
+//            System.out.println("Interpolation [" + interpolation.getMainTemperatureMeasurement().getPoint().getName() + "] [" + interpolation.getMoment() + "] exported successfully.");
         }
     }
 
