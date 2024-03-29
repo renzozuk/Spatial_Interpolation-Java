@@ -11,6 +11,8 @@ import java.util.List;
 
 public class Program {
     public static void main(String[] args) throws FileNotFoundException, InterruptedException {
+        long checkpoint1 = System.currentTimeMillis();
+
         List<Point> locations = FileManagementService.importLocations();
 
         Runnable firstDatabase = () -> {
@@ -44,7 +46,7 @@ public class Program {
 
         Runnable secondTask = () -> InterpolationService.exportInterpolation(new MomentIterator("01/01/2021", "31/12/2023"), locations.subList(locations.size() / 3, locations.size() / 3 * 2));
 
-        Runnable thirdTask = () -> InterpolationService.exportInterpolation(new MomentIterator("01/01/2021", "31/12/2023"), locations.subList(locations.size() / 3 * 2, locations.size()));
+        Runnable thirdTask = () -> InterpolationService.exportInterpolation(new MomentIterator("01/01/2021", "31/12/2023"), locations.subList(locations.size() / 3 * 2, locations.size())));
 
         Thread.Builder builder1 = Thread.ofVirtual().name("worker-", 0);
         Thread.Builder builder2 = Thread.ofVirtual().name("worker-", 1);
@@ -58,6 +60,8 @@ public class Program {
         db2.join();
         db3.join();
 
+        long checkpoint2 = System.currentTimeMillis();
+
         Thread t1 = builder1.start(firstTask);
         Thread t2 = builder2.start(secondTask);
         Thread t3 = builder3.start(thirdTask);
@@ -65,5 +69,11 @@ public class Program {
         t1.join();
         t2.join();
         t3.join();
+
+        long checkpoint3 = System.currentTimeMillis();
+
+        System.out.printf("Time to read the database: %.3fs%n", (checkpoint2 - checkpoint1) / 1e3);
+        System.out.printf("Time to export the required locations: %.3fs%n", (checkpoint3 - checkpoint2) / 1e3);
+        System.out.printf("Total time: %.3fs%n", (checkpoint3 - checkpoint1) / 1e3);
     }
 }

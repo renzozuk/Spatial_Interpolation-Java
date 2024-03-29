@@ -21,14 +21,14 @@ public class Interpolation {
 
         TemperatureMeasurementRepository temperatureMeasurementRepository = TemperatureMeasurementRepository.getInstance();
 
-        placeDistanceRelation = temperatureMeasurementRepository.getTemperatureMeasurementMomentRelation().get(moment)
+        placeDistanceRelation = temperatureMeasurementRepository.getMomentTemperatureMeasurementRelation().get(moment)
                 .stream()
                 .collect(Collectors.toMap(
                         tm -> tm,
                         tm -> tm.getPoint().getDistanceFromAnotherPoint(mainPlace)
                 ));
 
-        mainTemperatureMeasurement = new TemperatureMeasurement(mainPlace, calculateTemperatureForMainPlace(placeDistanceRelation));
+        mainTemperatureMeasurement = new TemperatureMeasurement(mainPlace, calculateTemperatureForMainPlace());
     }
 
     public Interpolation(Point mainPlace, String moment){
@@ -55,7 +55,7 @@ public class Interpolation {
         return moment;
     }
 
-    public double calculateTemperatureForMainPlace(Map<TemperatureMeasurement, Double> placeDistanceRelation){
+    public double calculateTemperatureForMainPlace(){
         double numerator = 0.0;
         double denominator = 0.0;
         double powerParameter = 2.5;

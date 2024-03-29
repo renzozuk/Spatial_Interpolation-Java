@@ -10,10 +10,10 @@ import java.util.Map;
 
 public class TemperatureMeasurementRepository {
     private static TemperatureMeasurementRepository temperatureMeasurementRepository;
-    private Map<Instant, List<TemperatureMeasurement>> temperatureMeasurementMomentRelation;
+    private Map<Instant, List<TemperatureMeasurement>> momentTemperatureMeasurementRelation;
 
     private TemperatureMeasurementRepository() {
-        temperatureMeasurementMomentRelation = new HashMap<>();
+        momentTemperatureMeasurementRelation = new HashMap<>();
     }
 
     public static TemperatureMeasurementRepository getInstance(){
@@ -24,19 +24,19 @@ public class TemperatureMeasurementRepository {
         return temperatureMeasurementRepository;
     }
 
-    public Map<Instant, List<TemperatureMeasurement>> getTemperatureMeasurementMomentRelation() {
-        return temperatureMeasurementMomentRelation;
+    public Map<Instant, List<TemperatureMeasurement>> getMomentTemperatureMeasurementRelation() {
+        return momentTemperatureMeasurementRelation;
     }
 
     public void addRelation(Instant moment, TemperatureMeasurement temperatureMeasurement){
-        if(temperatureMeasurementMomentRelation.containsKey(moment)){
-            temperatureMeasurementMomentRelation.get(moment).add(temperatureMeasurement);
+        if(momentTemperatureMeasurementRelation.containsKey(moment)){
+            momentTemperatureMeasurementRelation.get(moment).add(temperatureMeasurement);
         }else{
             List<TemperatureMeasurement> temperatureMeasurements = new ArrayList<>();
 
             temperatureMeasurements.add(temperatureMeasurement);
 
-            temperatureMeasurementMomentRelation.put(moment, temperatureMeasurements);
+            momentTemperatureMeasurementRelation.put(moment, temperatureMeasurements);
         }
     }
 }

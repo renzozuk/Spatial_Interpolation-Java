@@ -56,7 +56,7 @@ public class InterpolationService {
 
             FileManagementService.exportInterpolation(interpolation);
 
-//            System.out.println("Interpolation [" + interpolation.getMainTemperatureMeasurement().getPoint().getName() + "] [" + interpolation.getMoment() + "] exported successfully.");
+            System.out.println("Interpolation [" + interpolation.getMainTemperatureMeasurement().getPoint().getName() + "] [" + interpolation.getMoment() + "] exported successfully.");
         }
     }
 
@@ -68,13 +68,7 @@ public class InterpolationService {
         while(iterator.hasNext()){
             Calendar currentMoment = iterator.next();
 
-            for(Point location : locations){
-                Interpolation interpolation = new Interpolation(location, currentMoment.toInstant());
-
-                FileManagementService.exportInterpolation(interpolation);
-
-//                System.out.println("Interpolation [" + interpolation.getMainTemperatureMeasurement().getPoint().getName() + "] [" + interpolation.getMoment() + "] exported successfully.");
-            }
+            exportInterpolation(currentMoment.toInstant(), locations);
         }
     }
 }
