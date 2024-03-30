@@ -5,11 +5,7 @@ import entities.Point;
 import entities.TemperatureMeasurement;
 import repositories.TemperatureMeasurementRepository;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Instant;
@@ -139,8 +135,11 @@ public class FileManagementService {
                     interpolation.getMainTemperatureMeasurement().getPoint().getLongitude() + ".csv",
                     true);
 
-            writer.write(interpolation.getMoment() + ";");
-            writer.write(interpolation.getMainTemperatureMeasurement().getTemperature() + "\n");
+            BufferedWriter bufferedWriter = new BufferedWriter(writer);
+
+            bufferedWriter.write(interpolation.getMoment() + ";" + interpolation.getMainTemperatureMeasurement().getTemperature() + "\n");
+
+            bufferedWriter.close();
 
             writer.close();
         } catch (IOException e) {

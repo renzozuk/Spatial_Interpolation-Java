@@ -44,11 +44,11 @@ public class Program {
             }
         };
 
-        Runnable firstTask = () -> InterpolationService.exportInterpolation(new MomentIterator("01/01/2021", "31/12/2023"), locations.subList(0, locations.size() / 3));
+        Runnable firstTask = () -> InterpolationService.exportInterpolation(new MomentIterator("01/01/2021", "31/12/2023"), locations.get(12));
 
-        Runnable secondTask = () -> InterpolationService.exportInterpolation(new MomentIterator("01/01/2021", "31/12/2023"), locations.subList(locations.size() / 3, locations.size() / 3 * 2));
+        Runnable secondTask = () -> InterpolationService.exportInterpolation(new MomentIterator("01/01/2021", "31/12/2023"), locations.get(13));
 
-        Runnable thirdTask = () -> InterpolationService.exportInterpolation(new MomentIterator("01/01/2021", "31/12/2023"), locations.subList(locations.size() / 3 * 2, locations.size()));
+        Runnable thirdTask = () -> InterpolationService.exportInterpolation(new MomentIterator("01/01/2021", "31/12/2023"), locations.getLast());
 
         runThreads(List.of(firstDatabase, secondDatabase, thirdDatabase));
 
