@@ -44,17 +44,17 @@ public class Program {
             }
         };
 
-        Runnable firstTask = () -> InterpolationService.exportInterpolation(new MomentIterator("01/01/2021", "31/12/2023"), locations.get(12));
+        Runnable firstTask = () -> InterpolationService.exportInterpolation(new MomentIterator("01/01/2021", "31/12/2023"), locations.subList(0, locations.size() / 3));
 
-        Runnable secondTask = () -> InterpolationService.exportInterpolation(new MomentIterator("01/01/2021", "31/12/2023"), locations.get(13));
+        Runnable secondTask = () -> InterpolationService.exportInterpolation(new MomentIterator("01/01/2021", "31/12/2023"), locations.subList(locations.size() / 3, locations.size() / 3 * 2));
 
-        Runnable thirdTask = () -> InterpolationService.exportInterpolation(new MomentIterator("01/01/2021", "31/12/2023"), locations.getLast());
+        Runnable thirdTask = () -> InterpolationService.exportInterpolation(new MomentIterator("01/01/2021", "31/12/2023"), locations.subList(locations.size() / 3 * 2, locations.size()));
 
-        runThreads(List.of(firstDatabase, secondDatabase, thirdDatabase));
+        runPlatformThreads(List.of(firstDatabase, secondDatabase, thirdDatabase));
 
         long checkpoint2 = System.currentTimeMillis();
 
-        runThreads(List.of(firstTask, secondTask, thirdTask));
+        runPlatformThreads(List.of(firstTask, secondTask, thirdTask));
 
         long checkpoint3 = System.currentTimeMillis();
 
@@ -63,11 +63,30 @@ public class Program {
         System.out.printf("Total time: %.3fs%n", (checkpoint3 - checkpoint1) / 1e3);
     }
 
-    private static void runThreads(List<Runnable> runnables) throws InterruptedException {
-        runThreads(runnables, Thread.MIN_PRIORITY);
+    private static void runPlatformThreads(List<Runnable> runnables) throws InterruptedException {
+        runPlatformThreads(runnables, Thread.MIN_PRIORITY);
     }
 
-    private static void runThreads(List<Runnable> runnables, int priority) throws InterruptedException {
+    private static void runVirtualThreads(List<Runnable> runnables) throws InterruptedException {
+        runVirtualThreads(runnables, Thread.MIN_PRIORITY);
+    }
+
+    private static void runPlatformThreads(List<Runnable> runnables, int priority) throws InterruptedException {
+        List<Thread> threads = new ArrayList<>();
+
+        for(int i = 0; i < runnables.size(); i++){
+            Builder builder = Thread.ofPlatform().name("worker-", i);
+
+            threads.add(builder.start(runnables.get(i)));
+        }
+
+        for(Thread thread : threads){
+            thread.setPriority(priority);
+            thread.join();
+        }
+    }
+
+    private static void runVirtualThreads(List<Runnable> runnables, int priority) throws InterruptedException {
         List<Thread> threads = new ArrayList<>();
 
         for(int i = 0; i < runnables.size(); i++){
