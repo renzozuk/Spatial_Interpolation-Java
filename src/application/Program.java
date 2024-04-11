@@ -7,8 +7,6 @@ import util.MomentIterator;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.lang.Thread.Builder;
-import java.util.ArrayList;
 import java.util.List;
 
 public class Program {
@@ -63,6 +61,10 @@ public class Program {
         System.out.printf("Total time: %.3fs%n", (checkpoint3 - checkpoint1) / 1e3);
     }
 
+    private static void runSerial(List<Runnable> runnables) {
+        runnables.forEach(Runnable::run);
+    }
+
     private static void runPlatformThreads(List<Runnable> runnables) throws InterruptedException {
         runPlatformThreads(runnables, Thread.MIN_PRIORITY);
     }
@@ -72,13 +74,7 @@ public class Program {
     }
 
     private static void runPlatformThreads(List<Runnable> runnables, int priority) throws InterruptedException {
-        List<Thread> threads = new ArrayList<>();
-
-        for(int i = 0; i < runnables.size(); i++){
-            Builder builder = Thread.ofPlatform().name("worker-", i);
-
-            threads.add(builder.start(runnables.get(i)));
-        }
+        List<Thread> threads = runnables.stream().map(r -> Thread.ofPlatform().name("worker").start(r)).toList();
 
         for(Thread thread : threads){
             thread.setPriority(priority);
@@ -87,13 +83,7 @@ public class Program {
     }
 
     private static void runVirtualThreads(List<Runnable> runnables, int priority) throws InterruptedException {
-        List<Thread> threads = new ArrayList<>();
-
-        for(int i = 0; i < runnables.size(); i++){
-            Builder builder = Thread.ofVirtual().name("worker-", i);
-
-            threads.add(builder.start(runnables.get(i)));
-        }
+        List<Thread> threads = runnables.stream().map(r -> Thread.ofVirtual().name("worker").start(r)).toList();
 
         for(Thread thread : threads){
             thread.setPriority(priority);
