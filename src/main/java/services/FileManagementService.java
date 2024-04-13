@@ -19,7 +19,7 @@ import java.util.Objects;
 import java.util.Scanner;
 
 public class FileManagementService {
-    private static final String HOME = "src//resources//";
+    private static final String HOME = "src//main//resources//";
 
     public static void importDatabase(String databaseName) throws IOException {
         File path = new File(HOME + "databases//" + databaseName);

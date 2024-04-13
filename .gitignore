@@ -3,6 +3,9 @@ out/
 !**/src/main/**/out/
 !**/src/test/**/out/
 
+### Maven ###
+target/
+
 ### Eclipse ###
 .apt_generated
 .classpath
@@ -28,9 +31,8 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-src/resources/databases/*
-!src/resources/databases/Uruguay - 2021/
-!src/resources/databases/Uruguay - 2022/
-!src/resources/databases/Uruguay - 2023/
-src/resources/output/*
-!src/resources/output/Petrópolis - RJ_-22.508156_-43.175495.csv
+src/main/resources/databases/*
+!src/main/resources/databases/Uruguay - 2022/
+!src/main/resources/databases/Uruguay - 2023/
+src/main/resources/output/*
+!src/main/resources/output/Petrópolis - RJ_-22.508156_-43.175495.csv

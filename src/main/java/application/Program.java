@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.List;
 
 public class Program {
-    public static void main(String[] args) throws FileNotFoundException, InterruptedException {
+    public static void main(String[] args) throws FileNotFoundException {
         long checkpoint1 = System.currentTimeMillis();
 
         List<Point> locations = FileManagementService.importLocations();
@@ -48,11 +48,15 @@ public class Program {
 
         Runnable thirdTask = () -> InterpolationService.exportInterpolation(new MomentIterator("01/01/2021", "31/12/2023"), locations.subList(locations.size() / 3 * 2, locations.size()));
 
-        runPlatformThreads(List.of(firstDatabase, secondDatabase, thirdDatabase));
+        runSequential(List.of(firstDatabase, secondDatabase, thirdDatabase));
+//        runPlatformThreads(List.of(firstDatabase, secondDatabase, thirdDatabase));
+//        runVirtualThreads(List.of(firstDatabase, secondDatabase, thirdDatabase));
 
         long checkpoint2 = System.currentTimeMillis();
 
-        runPlatformThreads(List.of(firstTask, secondTask, thirdTask));
+        runSequential(List.of(firstTask, secondTask, thirdTask));
+//        runPlatformThreads(List.of(firstTask, secondTask, thirdTask));
+//        runVirtualThreads(List.of(firstTask, secondTask, thirdTask));
 
         long checkpoint3 = System.currentTimeMillis();
 
@@ -61,7 +65,7 @@ public class Program {
         System.out.printf("Total time: %.3fs%n", (checkpoint3 - checkpoint1) / 1e3);
     }
 
-    private static void runSerial(List<Runnable> runnables) {
+    private static void runSequential(List<Runnable> runnables) {
         runnables.forEach(Runnable::run);
     }
 
@@ -74,7 +78,7 @@ public class Program {
     }
 
     private static void runPlatformThreads(List<Runnable> runnables, int priority) throws InterruptedException {
-        List<Thread> threads = runnables.stream().map(r -> Thread.ofPlatform().name("worker").start(r)).toList();
+        List<Thread> threads = runnables.stream().map(r -> Thread.ofPlatform().name(r.getClass().getSimpleName().split("/")[1]).start(r)).toList();
 
         for(Thread thread : threads){
             thread.setPriority(priority);
@@ -83,7 +87,7 @@ public class Program {
     }
 
     private static void runVirtualThreads(List<Runnable> runnables, int priority) throws InterruptedException {
-        List<Thread> threads = runnables.stream().map(r -> Thread.ofVirtual().name("worker").start(r)).toList();
+        List<Thread> threads = runnables.stream().map(r -> Thread.ofVirtual().name(r.getClass().getSimpleName().split("/")[1]).start(r)).toList();
 
         for(Thread thread : threads){
             thread.setPriority(priority);
