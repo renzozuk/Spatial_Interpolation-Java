@@ -1,9 +1,8 @@
 package services;
 
-import entities.Point;
-import util.MomentIterator;
+import entities.UnknownPoint;
+import repositories.LocationRepository;
 
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.List;
 
@@ -38,48 +37,64 @@ public class ExecutionService {
         }
     }
 
-    public static List<Runnable> getDBRunnables() {
-        Runnable firstRunnable = () -> {
+    public static List<Runnable> getImportationTasks() {
+        Runnable importKnownPoints = () -> {
             try {
-                FileManagementService.importDatabase("Brazil - 2021");
+                FileManagementService.importRandomData();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         };
 
-        Runnable secondRunnable = () -> {
+        Runnable importUnknownPoints = () -> {
             try {
-                FileManagementService.importDatabase("Brazil - 2022");
+                FileManagementService.importUnknownLocations();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         };
 
-        Runnable thirdRunnable = () -> {
-            try {
-                FileManagementService.importDatabase("Brazil - 2023");
-                FileManagementService.importDatabase("Uruguay - 2019");
-                FileManagementService.importDatabase("Uruguay - 2020");
-                FileManagementService.importDatabase("Uruguay - 2021");
-                FileManagementService.importDatabase("Uruguay - 2022");
-                FileManagementService.importDatabase("Uruguay - 2023");
-                System.gc();
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        };
-
-        return List.of(firstRunnable, secondRunnable, thirdRunnable);
+        return List.of(importKnownPoints, importUnknownPoints);
     }
 
-    public static List<Runnable> getDefaultTasks() throws FileNotFoundException {
-        List<Point> locations = FileManagementService.importLocations();
+    public static List<Runnable> getInterpolationTasks() {
+        List<UnknownPoint> unknownPoints = LocationRepository.getInstance().getUnknownPoints().stream().toList();
 
-        Runnable firstTask = () -> InterpolationService.exportInterpolation(new MomentIterator("01/01/2021", "31/12/2023"), locations.subList(0, locations.size() / 3));
+        Runnable firstTask = () -> InterpolationService.assignTemperatureToUnknownPoints(unknownPoints.subList(0, unknownPoints.size() / 3));
 
-        Runnable secondTask = () -> InterpolationService.exportInterpolation(new MomentIterator("01/01/2021", "31/12/2023"), locations.subList(locations.size() / 3, locations.size() / 3 * 2));
+        Runnable secondTask = () -> InterpolationService.assignTemperatureToUnknownPoints(unknownPoints.subList(unknownPoints.size() / 3, unknownPoints.size() / 3 * 2));
 
-        Runnable thirdTask = () -> InterpolationService.exportInterpolation(new MomentIterator("01/01/2021", "31/12/2023"), locations.subList(locations.size() / 3 * 2, locations.size()));
+        Runnable thirdTask = () -> InterpolationService.assignTemperatureToUnknownPoints(unknownPoints.subList(unknownPoints.size() / 3 * 2, unknownPoints.size()));
+
+        return List.of(firstTask, secondTask, thirdTask);
+    }
+
+    public static List<Runnable> getExportationTasks() {
+        List<UnknownPoint> unknownPoints = LocationRepository.getInstance().getUnknownPoints().stream().toList();
+
+        Runnable firstTask = () -> {
+            try {
+                FileManagementService.exportInterpolations(unknownPoints.subList(0, unknownPoints.size() / 3));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        };
+
+        Runnable secondTask = () -> {
+            try {
+                FileManagementService.exportInterpolations(unknownPoints.subList(unknownPoints.size() / 3, unknownPoints.size() / 3 * 2));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        };
+
+        Runnable thirdTask = () -> {
+            try {
+                FileManagementService.exportInterpolations(unknownPoints.subList(unknownPoints.size() / 3 * 2, unknownPoints.size()));
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        };
 
         return List.of(firstTask, secondTask, thirdTask);
     }

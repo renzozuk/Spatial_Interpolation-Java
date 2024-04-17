@@ -31,8 +31,5 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-src/main/resources/databases/*
-!src/main/resources/databases/Uruguay - 2022/
-!src/main/resources/databases/Uruguay - 2023/
+src/main/resources/databases/random_data.csv
 src/main/resources/output/*
-!src/main/resources/output/4.483121_-61.139314.csv

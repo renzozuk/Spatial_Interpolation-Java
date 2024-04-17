@@ -1,57 +1,26 @@
 package services;
 
-import entities.Interpolation;
-import entities.Point;
-import util.MomentConverter;
-import util.MomentIterator;
+import entities.KnownPoint;
+import entities.UnknownPoint;
+import repositories.LocationRepository;
 
-import java.time.Instant;
 import java.util.List;
 
 public class InterpolationService {
-    public static void showInterpolation(MomentIterator iterator, Point location){
-        while(iterator.hasNext()){
-            System.out.println(new Interpolation(location, iterator.next().toInstant()));
-        }
-    }
+    public static void assignTemperatureToUnknownPoint(UnknownPoint unknownPoint) {
+        double numerator = 0.0;
+        double denominator = 0.0;
+        double powerParameter = 2.5;
 
-    public static void showInterpolation(MomentIterator iterator, List<Point> locations){
-        while(iterator.hasNext()){
-            for(Point location : locations){
-                System.out.println(new Interpolation(location, iterator.next().toInstant()));
-            }
-        }
-    }
-
-//    public static void exportInterpolation(Instant moment, Point location) {
-//        FileManagementService.exportInterpolation(new Interpolation(location, moment));
-//    }
-//
-//    public static void exportInterpolation(String moment, Point location) {
-//        exportInterpolation(MomentConverter.mapToInstant(moment), location);
-//    }
-//
-//    public static void exportInterpolation(MomentIterator iterator, Point location) {
-//        while(iterator.hasNext()){
-//            FileManagementService.exportInterpolation(new Interpolation(location, iterator.next().toInstant()));
-//        }
-//    }
-
-    public static void exportInterpolation(Instant moment, List<Point> locations) {
-        for(Point location : locations) {
-            FileManagementService.exportInterpolation(new Interpolation(location, moment));
+        for(KnownPoint knownPoint : LocationRepository.getInstance().getKnownPoints()){
+            numerator += knownPoint.getTemperature() / Math.pow(knownPoint.getDistanceFromAnotherPoint(unknownPoint), powerParameter);
+            denominator += 1 / Math.pow(knownPoint.getDistanceFromAnotherPoint(unknownPoint), powerParameter);
         }
 
-        System.gc();
+        unknownPoint.setTemperature(numerator / denominator);
     }
 
-    public static void exportInterpolation(String moment, List<Point> locations) {
-        exportInterpolation(MomentConverter.mapToInstant(moment), locations);
-    }
-
-    public static void exportInterpolation(MomentIterator iterator, List<Point> locations) {
-        while(iterator.hasNext()){
-            exportInterpolation(iterator.next().toInstant(), locations);
-        }
+    public static void assignTemperatureToUnknownPoints(List<UnknownPoint> unknownPoints) {
+        unknownPoints.forEach(InterpolationService::assignTemperatureToUnknownPoint);
     }
 }
