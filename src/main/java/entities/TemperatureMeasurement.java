@@ -11,8 +11,8 @@ public class TemperatureMeasurement {
         this.temperature = temperature;
     }
 
-    public TemperatureMeasurement(String placeName, double latitude, double longitude, double temperature) {
-        this(new Point(placeName, latitude, longitude), temperature);
+    public TemperatureMeasurement(/*String placeName, */double latitude, double longitude, double temperature) {
+        this(new Point(/*placeName, */latitude, longitude), temperature);
     }
 
     public Point getPoint() {

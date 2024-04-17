@@ -23,24 +23,26 @@ public class InterpolationService {
         }
     }
 
-    public static void exportInterpolation(Instant moment, Point location) {
-        FileManagementService.exportInterpolation(new Interpolation(location, moment));
-    }
-
-    public static void exportInterpolation(String moment, Point location) {
-        exportInterpolation(MomentConverter.mapToInstant(moment), location);
-    }
-
-    public static void exportInterpolation(MomentIterator iterator, Point location) {
-        while(iterator.hasNext()){
-            FileManagementService.exportInterpolation(new Interpolation(location, iterator.next().toInstant()));
-        }
-    }
+//    public static void exportInterpolation(Instant moment, Point location) {
+//        FileManagementService.exportInterpolation(new Interpolation(location, moment));
+//    }
+//
+//    public static void exportInterpolation(String moment, Point location) {
+//        exportInterpolation(MomentConverter.mapToInstant(moment), location);
+//    }
+//
+//    public static void exportInterpolation(MomentIterator iterator, Point location) {
+//        while(iterator.hasNext()){
+//            FileManagementService.exportInterpolation(new Interpolation(location, iterator.next().toInstant()));
+//        }
+//    }
 
     public static void exportInterpolation(Instant moment, List<Point> locations) {
         for(Point location : locations) {
             FileManagementService.exportInterpolation(new Interpolation(location, moment));
         }
+
+        System.gc();
     }
 
     public static void exportInterpolation(String moment, List<Point> locations) {

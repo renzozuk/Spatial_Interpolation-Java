@@ -8,7 +8,7 @@ public class PlatformThreads {
     public static void main(String[] args) throws InterruptedException, FileNotFoundException {
         long checkpoint1 = System.currentTimeMillis();
 
-        ExecutionService.runPlatformThreads(ExecutionService.getDefaultDatabases());
+        ExecutionService.runPlatformThreads(ExecutionService.getDBRunnables());
 
         long checkpoint2 = System.currentTimeMillis();
 

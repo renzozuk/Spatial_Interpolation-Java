@@ -3,11 +3,11 @@ package entities;
 import java.util.Objects;
 
 public class Point {
-    private String name;
+    /*private String name;*/
     private double latitude;
     private double longitude;
 
-    public Point(String name, double latitude, double longitude) {
+    public Point(/*String name, */double latitude, double longitude) {
         if(latitude < -90.0 || latitude > 90.00){
             throw new IllegalArgumentException("Invalid value for latitude. Note that the latitude value must be between -90 and 90.");
         }
@@ -16,14 +16,14 @@ public class Point {
             throw new IllegalArgumentException("Invalid value for longitude. Note that the longitude value must be between -180 and 180.");
         }
 
-        this.name = name;
+//        this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
     }
 
-    public String getName() {
-        return name;
-    }
+//    public String getName() {
+//        return name;
+//    }
 
     public double getLatitude() {
         return latitude;
@@ -45,10 +45,10 @@ public class Point {
         return Objects.hash(super.hashCode(), latitude, longitude);
     }
 
-    @Override
-    public String toString() {
-        return "[City: " +  name + "] [Latitude: " + String.format("%.2f", latitude) + "] [Longitude: " + String.format("%.2f", longitude) + "] ";
-    }
+//    @Override
+//    public String toString() {
+//        return "[City: " +  name + "] [Latitude: " + String.format("%.2f", latitude) + "] [Longitude: " + String.format("%.2f", longitude) + "] ";
+//    }
 
     public double getDistanceFromAnotherPoint(Point point){
         if(this == point){

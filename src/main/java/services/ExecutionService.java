@@ -38,35 +38,38 @@ public class ExecutionService {
         }
     }
 
-    public static List<Runnable> getDefaultDatabases() {
-        Runnable firstDatabase = () -> {
+    public static List<Runnable> getDBRunnables() {
+        Runnable firstRunnable = () -> {
             try {
                 FileManagementService.importDatabase("Brazil - 2021");
-                FileManagementService.importDatabase("Uruguay - 2021");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         };
 
-        Runnable secondDatabase = () -> {
+        Runnable secondRunnable = () -> {
             try {
                 FileManagementService.importDatabase("Brazil - 2022");
-                FileManagementService.importDatabase("Uruguay - 2022");
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         };
 
-        Runnable thirdDatabase = () -> {
+        Runnable thirdRunnable = () -> {
             try {
                 FileManagementService.importDatabase("Brazil - 2023");
+                FileManagementService.importDatabase("Uruguay - 2019");
+                FileManagementService.importDatabase("Uruguay - 2020");
+                FileManagementService.importDatabase("Uruguay - 2021");
+                FileManagementService.importDatabase("Uruguay - 2022");
                 FileManagementService.importDatabase("Uruguay - 2023");
+                System.gc();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         };
 
-        return List.of(firstDatabase, secondDatabase, thirdDatabase);
+        return List.of(firstRunnable, secondRunnable, thirdRunnable);
     }
 
     public static List<Runnable> getDefaultTasks() throws FileNotFoundException {

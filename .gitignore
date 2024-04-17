@@ -35,4 +35,4 @@ src/main/resources/databases/*
 !src/main/resources/databases/Uruguay - 2022/
 !src/main/resources/databases/Uruguay - 2023/
 src/main/resources/output/*
-!src/main/resources/output/Petrópolis - RJ_-22.508156_-43.175495.csv
+!src/main/resources/output/4.483121_-61.139314.csv

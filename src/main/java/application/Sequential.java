@@ -8,11 +8,11 @@ public class Sequential {
     public static void main(String[] args) throws FileNotFoundException {
         long checkpoint1 = System.currentTimeMillis();
 
-        ExecutionService.runSequential(ExecutionService.getDefaultDatabases());
+        ExecutionService.runSequential(ExecutionService.getDBRunnables());
 
         long checkpoint2 = System.currentTimeMillis();
 
-        ExecutionService.runSequential(ExecutionService.getDefaultTasks());
+//        ExecutionService.runSequential(ExecutionService.getDefaultTasks());
 
         long checkpoint3 = System.currentTimeMillis();
 

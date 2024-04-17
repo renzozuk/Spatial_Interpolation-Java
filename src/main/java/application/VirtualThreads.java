@@ -8,7 +8,7 @@ public class VirtualThreads {
     public static void main(String[] args) throws InterruptedException, FileNotFoundException {
         long checkpoint1 = System.currentTimeMillis();
 
-        ExecutionService.runVirtualThreads(ExecutionService.getDefaultDatabases());
+        ExecutionService.runVirtualThreads(ExecutionService.getDBRunnables());
 
         long checkpoint2 = System.currentTimeMillis();
 
