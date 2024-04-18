@@ -9,8 +9,8 @@ import java.util.Set;
 
 public class LocationRepository {
     private static LocationRepository instance;
-    private Set<KnownPoint> knownPoints;
-    private Set<UnknownPoint> unknownPoints;
+    private final Set<KnownPoint> knownPoints;
+    private final Set<UnknownPoint> unknownPoints;
 
     private LocationRepository() {
         knownPoints = new HashSet<>();
@@ -39,9 +39,5 @@ public class LocationRepository {
 
     public void addUnknownPoint(UnknownPoint unknownPoint) {
         unknownPoints.add(unknownPoint);
-    }
-
-    public void assignTemperatureToUnknownPoints() {
-        unknownPoints.forEach(InterpolationService::assignTemperatureToUnknownPoint);
     }
 }
