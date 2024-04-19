@@ -1,4 +1,4 @@
-package entities;
+package br.ufrn.dimap.entities;
 
 import java.util.Objects;
 

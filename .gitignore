@@ -31,5 +31,7 @@ bin/
 ### Mac OS ###
 .DS_Store
 
-src/main/resources/databases/random_data.csv
+src/main/resources/databases/
+!src/main/resources/databases/true_data.csv
 src/main/resources/output/*
+!src/main/resources/output/exported_locations.csv

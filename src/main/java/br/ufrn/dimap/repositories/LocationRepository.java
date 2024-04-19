@@ -1,8 +1,7 @@
-package repositories;
+package br.ufrn.dimap.repositories;
 
-import entities.KnownPoint;
-import entities.UnknownPoint;
-import services.InterpolationService;
+import br.ufrn.dimap.entities.KnownPoint;
+import br.ufrn.dimap.entities.UnknownPoint;
 
 import java.util.HashSet;
 import java.util.Set;

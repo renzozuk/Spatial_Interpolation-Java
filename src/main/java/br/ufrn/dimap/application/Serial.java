@@ -1,20 +1,20 @@
-package application;
+package br.ufrn.dimap.application;
 
-import services.ExecutionService;
+import br.ufrn.dimap.services.ExecutionService;
 
-public class Sequential {
+public class Serial {
     public static void main(String[] args) {
         long checkpoint1 = System.currentTimeMillis();
 
-        ExecutionService.runSequential(ExecutionService.getImportationTasks());
+        ExecutionService.runSerial(ExecutionService.getImportationTasks());
 
         long checkpoint2 = System.currentTimeMillis();
 
-        ExecutionService.runSequential(ExecutionService.getInterpolationTasks());
+        ExecutionService.runSerial(ExecutionService.getInterpolationTasks());
 
         long checkpoint3 = System.currentTimeMillis();
 
-        ExecutionService.runSequential(ExecutionService.getExportationTasks());
+        ExecutionService.runSerial(ExecutionService.getExportationTasks());
 
         long checkpoint4 = System.currentTimeMillis();
 

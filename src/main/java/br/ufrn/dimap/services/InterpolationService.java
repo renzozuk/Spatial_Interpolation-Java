@@ -1,8 +1,9 @@
-package services;
+package br.ufrn.dimap.services;
 
-import entities.KnownPoint;
-import entities.UnknownPoint;
-import repositories.LocationRepository;
+import br.ufrn.dimap.entities.KnownPoint;
+import br.ufrn.dimap.entities.UnknownPoint;
+import br.ufrn.dimap.repositories.LocationRepository;
+import org.openjdk.jmh.annotations.*;
 
 import java.util.List;
 

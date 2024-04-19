@@ -1,6 +1,6 @@
-package application;
+package br.ufrn.dimap.application;
 
-import services.ExecutionService;
+import br.ufrn.dimap.services.ExecutionService;
 
 public class PlatformThreads {
     public static void main(String[] args) throws InterruptedException {

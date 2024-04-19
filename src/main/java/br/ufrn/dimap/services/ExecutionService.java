@@ -1,14 +1,14 @@
-package services;
+package br.ufrn.dimap.services;
 
-import entities.UnknownPoint;
-import repositories.LocationRepository;
+import br.ufrn.dimap.entities.UnknownPoint;
+import br.ufrn.dimap.repositories.LocationRepository;
 
 import java.io.IOException;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
 public class ExecutionService {
-    public static void runSequential(List<Runnable> tasks) {
+    public static void runSerial(List<Runnable> tasks) {
         tasks.forEach(Runnable::run);
     }
 
