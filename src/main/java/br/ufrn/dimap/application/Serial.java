@@ -6,7 +6,7 @@ public class Serial {
     public static void main(String[] args) {
         long checkpoint1 = System.currentTimeMillis();
 
-        ExecutionService.runSerial(ExecutionService.getImportationTasks());
+        ExecutionService.runSerial(ExecutionService.getImportationTasksForSerial());
 
         long checkpoint2 = System.currentTimeMillis();
 
@@ -14,7 +14,7 @@ public class Serial {
 
         long checkpoint3 = System.currentTimeMillis();
 
-        ExecutionService.runSerial(ExecutionService.getExportationTasks());
+        ExecutionService.runSerial(ExecutionService.getExportationTasksForSerial());
 
         long checkpoint4 = System.currentTimeMillis();
 

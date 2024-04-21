@@ -6,7 +6,7 @@ public class VirtualThreads {
     public static void main(String[] args) throws InterruptedException {
         long checkpoint1 = System.currentTimeMillis();
 
-        ExecutionService.runVirtualThreads(ExecutionService.getImportationTasks());
+        ExecutionService.runVirtualThreads(ExecutionService.getImportationTasksForThreads());
 
         long checkpoint2 = System.currentTimeMillis();
 
@@ -14,7 +14,7 @@ public class VirtualThreads {
 
         long checkpoint3 = System.currentTimeMillis();
 
-        ExecutionService.runVirtualThreads(ExecutionService.getExportationTasks());
+        ExecutionService.runVirtualThreads(ExecutionService.getExportationTasksForThreads());
 
         long checkpoint4 = System.currentTimeMillis();
 

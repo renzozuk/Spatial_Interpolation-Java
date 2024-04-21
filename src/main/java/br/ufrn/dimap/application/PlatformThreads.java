@@ -6,7 +6,7 @@ public class PlatformThreads {
     public static void main(String[] args) throws InterruptedException {
         long checkpoint1 = System.currentTimeMillis();
 
-        ExecutionService.runPlatformThreads(ExecutionService.getImportationTasks());
+        ExecutionService.runPlatformThreads(ExecutionService.getImportationTasksForThreads());
 
         long checkpoint2 = System.currentTimeMillis();
 
@@ -14,7 +14,7 @@ public class PlatformThreads {
 
         long checkpoint3 = System.currentTimeMillis();
 
-        ExecutionService.runPlatformThreads(ExecutionService.getExportationTasks());
+        ExecutionService.runPlatformThreads(ExecutionService.getExportationTasksForThreads());
 
         long checkpoint4 = System.currentTimeMillis();
 
