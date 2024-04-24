@@ -7,7 +7,8 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Semaphore;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 
 public class ExecutionService {
@@ -58,11 +59,11 @@ public class ExecutionService {
     }
 
     public static Set<Runnable> getImportationTasksForThreads() {
-        Semaphore semaphore = new Semaphore(1);
+        Lock lock = new ReentrantLock();
 
         Runnable importKnownPoints = () -> {
             try {
-                FileManagementService.importRandomData(semaphore);
+                FileManagementService.importRandomData(lock);
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -70,7 +71,7 @@ public class ExecutionService {
 
         Runnable importUnknownPoints = () -> {
             try {
-                FileManagementService.importUnknownLocations(semaphore);
+                FileManagementService.importUnknownLocations(lock);
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -82,11 +83,13 @@ public class ExecutionService {
     public static Set<Runnable> getInterpolationTasks() {
         List<UnknownPoint> unknownPoints = LocationRepository.getInstance().getUnknownPoints().stream().toList();
 
-        Runnable firstTask = () -> InterpolationService.assignTemperatureToUnknownPoints(unknownPoints.subList(0, unknownPoints.size() / 2));
+        Runnable firstTask = () -> InterpolationService.assignTemperatureToUnknownPoints(unknownPoints.subList(0, unknownPoints.size() / 3));
 
-        Runnable secondTask = () -> InterpolationService.assignTemperatureToUnknownPoints(unknownPoints.subList(unknownPoints.size() / 2, unknownPoints.size()));
+        Runnable secondTask = () -> InterpolationService.assignTemperatureToUnknownPoints(unknownPoints.subList(unknownPoints.size() / 3, unknownPoints.size() / 3 * 2));
 
-        return Set.of(firstTask, secondTask);
+        Runnable thirdTask = () -> InterpolationService.assignTemperatureToUnknownPoints(unknownPoints.subList(unknownPoints.size() / 3 * 2, unknownPoints.size()));
+
+        return Set.of(firstTask, secondTask, thirdTask);
     }
 
     public static Set<Runnable> getExportationTasksForSerial() {
@@ -102,13 +105,13 @@ public class ExecutionService {
     }
 
     public static Set<Runnable> getExportationTasksForThreads() {
-        Semaphore semaphore = new Semaphore(1);
+        Lock lock = new ReentrantLock();
 
         List<UnknownPoint> unknownPoints = LocationRepository.getInstance().getUnknownPoints().stream().toList();
 
         Runnable firstTask = () -> {
             try {
-                FileManagementService.exportInterpolations(semaphore, unknownPoints.subList(0, unknownPoints.size() / 3));
+                FileManagementService.exportInterpolations(lock, unknownPoints.subList(0, unknownPoints.size() / 3));
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -116,7 +119,7 @@ public class ExecutionService {
 
         Runnable secondTask = () -> {
             try {
-                FileManagementService.exportInterpolations(semaphore, unknownPoints.subList(unknownPoints.size() / 3, unknownPoints.size() / 3 * 2));
+                FileManagementService.exportInterpolations(lock, unknownPoints.subList(unknownPoints.size() / 3, unknownPoints.size() / 3 * 2));
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
@@ -124,7 +127,7 @@ public class ExecutionService {
 
         Runnable thirdTask = () -> {
             try {
-                FileManagementService.exportInterpolations(semaphore, unknownPoints.subList(unknownPoints.size() / 3 * 2, unknownPoints.size()));
+                FileManagementService.exportInterpolations(lock, unknownPoints.subList(unknownPoints.size() / 3 * 2, unknownPoints.size()));
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
