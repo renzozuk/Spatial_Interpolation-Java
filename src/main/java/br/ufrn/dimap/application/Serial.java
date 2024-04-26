@@ -1,23 +1,23 @@
 package br.ufrn.dimap.application;
 
-import br.ufrn.dimap.services.ExecutionService;
+import static br.ufrn.dimap.services.ExecutionService.getImportationTasksForSerial;
+import static br.ufrn.dimap.services.ExecutionService.getInterpolationTasks;
+import static br.ufrn.dimap.services.ExecutionService.getExportationTasksForSerial;
+import static br.ufrn.dimap.services.ExecutionService.printResult;
+import static br.ufrn.dimap.services.ExecutionService.runSerial;
 
 public class Serial {
     public static void main(String[] args) {
+        runSerial(getImportationTasksForSerial());
+
         long checkpoint1 = System.currentTimeMillis();
 
-        ExecutionService.runSerial(ExecutionService.getImportationTasksForSerial());
+        runSerial(getInterpolationTasks());
 
         long checkpoint2 = System.currentTimeMillis();
 
-        ExecutionService.runSerial(ExecutionService.getInterpolationTasks());
+        runSerial(getExportationTasksForSerial());
 
-        long checkpoint3 = System.currentTimeMillis();
-
-        ExecutionService.runSerial(ExecutionService.getExportationTasksForSerial());
-
-        long checkpoint4 = System.currentTimeMillis();
-
-        ExecutionService.printResult(checkpoint1, checkpoint2, checkpoint3, checkpoint4);
+        printResult(checkpoint1, checkpoint2);
     }
 }

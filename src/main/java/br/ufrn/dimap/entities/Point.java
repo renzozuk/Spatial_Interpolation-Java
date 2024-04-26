@@ -64,7 +64,7 @@ public abstract class Point {
         double longitudeDistance = point.getLongitude() * Math.PI / 180 - longitude * Math.PI / 180;
         double a = Math.sin(latitudeDistance / 2) * Math.sin(latitudeDistance / 2) +
                 Math.cos(latitude * Math.PI / 180) * Math.cos(point.getLatitude() * Math.PI / 180) *
-                        Math.sin(longitudeDistance / 2) * Math.sin(longitudeDistance / 2);
+                Math.sin(longitudeDistance / 2) * Math.sin(longitudeDistance / 2);
 //        6378.137 = earth radius
         return 6378.137 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
     }

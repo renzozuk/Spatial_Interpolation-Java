@@ -3,7 +3,6 @@ package br.ufrn.dimap.services;
 import br.ufrn.dimap.entities.KnownPoint;
 import br.ufrn.dimap.entities.UnknownPoint;
 import br.ufrn.dimap.repositories.LocationRepository;
-import org.openjdk.jmh.annotations.*;
 
 import java.util.List;
 

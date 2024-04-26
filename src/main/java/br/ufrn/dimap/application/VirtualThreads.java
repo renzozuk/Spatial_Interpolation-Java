@@ -1,23 +1,23 @@
 package br.ufrn.dimap.application;
 
-import br.ufrn.dimap.services.ExecutionService;
+import static br.ufrn.dimap.services.ExecutionService.getImportationTasksForThreads;
+import static br.ufrn.dimap.services.ExecutionService.getInterpolationTasks;
+import static br.ufrn.dimap.services.ExecutionService.getExportationTasksForThreads;
+import static br.ufrn.dimap.services.ExecutionService.printResult;
+import static br.ufrn.dimap.services.ExecutionService.runVirtualThreads;
 
 public class VirtualThreads {
     public static void main(String[] args) throws InterruptedException {
+        runVirtualThreads(getImportationTasksForThreads());
+
         long checkpoint1 = System.currentTimeMillis();
 
-        ExecutionService.runVirtualThreads(ExecutionService.getImportationTasksForThreads());
+        runVirtualThreads(getInterpolationTasks());
 
         long checkpoint2 = System.currentTimeMillis();
 
-        ExecutionService.runVirtualThreads(ExecutionService.getInterpolationTasks());
+        runVirtualThreads(getExportationTasksForThreads());
 
-        long checkpoint3 = System.currentTimeMillis();
-
-        ExecutionService.runVirtualThreads(ExecutionService.getExportationTasksForThreads());
-
-        long checkpoint4 = System.currentTimeMillis();
-
-        ExecutionService.printResult(checkpoint1, checkpoint2, checkpoint3, checkpoint4);
+        printResult(checkpoint1, checkpoint2);
     }
 }

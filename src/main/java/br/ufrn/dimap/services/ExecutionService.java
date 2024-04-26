@@ -17,11 +17,11 @@ public class ExecutionService {
     }
 
     public static void runPlatformThreads(Collection<Runnable> tasks) throws InterruptedException {
-        runPlatformThreads(tasks, Thread.MIN_PRIORITY);
+        runPlatformThreads(tasks, Thread.MAX_PRIORITY);
     }
 
     public static void runVirtualThreads(Collection<Runnable> tasks) throws InterruptedException {
-        runVirtualThreads(tasks, Thread.MIN_PRIORITY);
+        runVirtualThreads(tasks, Thread.MAX_PRIORITY);
     }
 
     public static void runPlatformThreads(Collection<Runnable> tasks, int priority) throws InterruptedException {
@@ -50,7 +50,7 @@ public class ExecutionService {
         Runnable importUnknownPoints = () -> {
             try {
                 FileManagementService.importUnknownLocations();
-            } catch (IOException | InterruptedException e) {
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         };
@@ -72,7 +72,7 @@ public class ExecutionService {
         Runnable importUnknownPoints = () -> {
             try {
                 FileManagementService.importUnknownLocations(lock);
-            } catch (IOException | InterruptedException e) {
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         };
@@ -83,13 +83,15 @@ public class ExecutionService {
     public static Set<Runnable> getInterpolationTasks() {
         List<UnknownPoint> unknownPoints = LocationRepository.getInstance().getUnknownPoints().stream().toList();
 
-        Runnable firstTask = () -> InterpolationService.assignTemperatureToUnknownPoints(unknownPoints.subList(0, unknownPoints.size() / 3));
+        Runnable firstTask = () -> InterpolationService.assignTemperatureToUnknownPoints(unknownPoints.subList(0, unknownPoints.size() / 4));
 
-        Runnable secondTask = () -> InterpolationService.assignTemperatureToUnknownPoints(unknownPoints.subList(unknownPoints.size() / 3, unknownPoints.size() / 3 * 2));
+        Runnable secondTask = () -> InterpolationService.assignTemperatureToUnknownPoints(unknownPoints.subList(unknownPoints.size() / 4, unknownPoints.size() / 2));
 
-        Runnable thirdTask = () -> InterpolationService.assignTemperatureToUnknownPoints(unknownPoints.subList(unknownPoints.size() / 3 * 2, unknownPoints.size()));
+        Runnable thirdTask = () -> InterpolationService.assignTemperatureToUnknownPoints(unknownPoints.subList(unknownPoints.size() / 2, unknownPoints.size() / 4 * 3));
 
-        return Set.of(firstTask, secondTask, thirdTask);
+        Runnable fourthTask = () -> InterpolationService.assignTemperatureToUnknownPoints(unknownPoints.subList(unknownPoints.size() / 4 * 3, unknownPoints.size()));
+
+        return Set.of(firstTask, secondTask, thirdTask, fourthTask);
     }
 
     public static Set<Runnable> getExportationTasksForSerial() {
@@ -136,15 +138,13 @@ public class ExecutionService {
         return Set.of(firstTask, secondTask, thirdTask);
     }
 
-    public static void printResult(long checkpoint1, long checkpoint2, long checkpoint3) {
+    public static void printResult(long checkpoint1, long checkpoint2) {
         System.out.printf("Interpolation time: %.3fs%n", (checkpoint2 - checkpoint1) / 1e3);
-        System.out.printf("Time to export the required locations: %.3fs%n", (checkpoint3 - checkpoint2) / 1e3);
-        System.out.printf("Total time: %.3fs%n", (checkpoint3 - checkpoint1) / 1e3);
     }
 
     public static void printResult(long checkpoint1, long checkpoint2, long checkpoint3, long checkpoint4) {
         System.out.printf("Time to read the known and unknown locations: %.3fs%n", (checkpoint2 - checkpoint1) / 1e3);
-        System.out.printf("Interpolation time: %.3fs%n", (checkpoint3 - checkpoint2) / 1e3);
+        printResult(checkpoint2, checkpoint3);
         System.out.printf("Time to export the required locations: %.3fs%n", (checkpoint4 - checkpoint3) / 1e3);
         System.out.printf("Total time: %.3fs%n", (checkpoint4 - checkpoint1) / 1e3);
     }
