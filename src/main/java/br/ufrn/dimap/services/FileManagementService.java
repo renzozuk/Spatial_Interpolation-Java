@@ -9,6 +9,10 @@ import java.io.BufferedWriter;
 import java.io.IOException;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.time.temporal.TemporalField;
 import java.util.Collection;
 import java.util.concurrent.locks.Lock;
 
@@ -19,7 +23,7 @@ import static java.nio.file.Files.newBufferedWriter;
 
 public class FileManagementService {
     private static final String HOME = "src//main//resources//";
-    private static final Path exportationPath = Path.of(HOME + "output//exported_locations.csv");
+    private static Path exportationPath = Path.of(HOME + "output//exported_locations.csv");
 
     public static void importKnownLocations(String dataPath) throws IOException {
         LocationRepository locationRepository = LocationRepository.getInstance();
@@ -109,6 +113,11 @@ public class FileManagementService {
         }
 
         bufferedReader.close();
+    }
+
+    public static void defineExportationPath() {
+        ZonedDateTime zdt = Instant.now().atZone(ZoneId.of("Etc/GMT+0"));
+        exportationPath = Path.of(HOME + "output//exported_locations_" + String.format("%04d.%02d.%02d-%02d.%02d.%02d.csv", zdt.getYear(), zdt.getMonthValue(), zdt.getDayOfMonth(), zdt.getHour(), zdt.getMinute(), zdt.getSecond()));
     }
 
     public static void exportInterpolations(Collection<UnknownPoint> unknownPoints) throws IOException, InterruptedException {

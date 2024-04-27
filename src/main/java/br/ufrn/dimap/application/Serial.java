@@ -5,19 +5,26 @@ import static br.ufrn.dimap.services.ExecutionService.getInterpolationTasks;
 import static br.ufrn.dimap.services.ExecutionService.getExportationTasksForSerial;
 import static br.ufrn.dimap.services.ExecutionService.printResult;
 import static br.ufrn.dimap.services.ExecutionService.runSerial;
+import static br.ufrn.dimap.services.FileManagementService.defineExportationPath;
 
 public class Serial {
     public static void main(String[] args) {
-        runSerial(getImportationTasksForSerial());
-
         long checkpoint1 = System.currentTimeMillis();
 
-        runSerial(getInterpolationTasks());
+        runSerial(getImportationTasksForSerial());
 
         long checkpoint2 = System.currentTimeMillis();
 
+        runSerial(getInterpolationTasks());
+
+        long checkpoint3 = System.currentTimeMillis();
+
+        defineExportationPath();
+
         runSerial(getExportationTasksForSerial());
 
-        printResult(checkpoint1, checkpoint2);
+        long checkpoint4 = System.currentTimeMillis();
+
+        printResult(checkpoint1, checkpoint2, checkpoint3, checkpoint4);
     }
 }
