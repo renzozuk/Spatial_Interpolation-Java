@@ -12,8 +12,8 @@ import java.nio.file.StandardOpenOption;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.time.temporal.TemporalField;
 import java.util.Collection;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
 
 import static java.nio.file.Files.createFile;
@@ -25,20 +25,32 @@ public class FileManagementService {
     private static final String HOME = "src//main//resources//";
     private static Path exportationPath = Path.of(HOME + "output//exported_locations.csv");
 
+    public static void importRandomData() throws IOException {
+        importKnownLocations("databases//random_data.csv");
+    }
+
+    public static void importRandomData(Lock lock) throws IOException, InterruptedException {
+        importKnownLocations(lock, "databases//random_data.csv");
+    }
+
+    public static void importRandomData(Semaphore semaphore) throws IOException, InterruptedException {
+        importKnownLocations(semaphore, "databases//random_data.csv");
+    }
+
+    public static void importTrueData() throws IOException {
+        importKnownLocations("databases//true_data.csv");
+    }
+
+    public static void importTrueData(Lock lock) throws IOException {
+        importKnownLocations(lock, "databases//true_data.csv");
+    }
+
+    public static void importTrueData(Semaphore semaphore) throws IOException, InterruptedException {
+        importKnownLocations(semaphore, "databases//true_data.csv");
+    }
+
     public static void importKnownLocations(String dataPath) throws IOException {
-        LocationRepository locationRepository = LocationRepository.getInstance();
-
-        BufferedReader bufferedReader = newBufferedReader(Path.of(HOME + dataPath));
-
-        String line;
-
-        while((line = bufferedReader.readLine()) != null){
-            String[] information = line.split(";");
-
-            locationRepository.addKnownPoint(new KnownPoint(Double.parseDouble(information[0]), Double.parseDouble(information[1]), Double.parseDouble(information[2])));
-        }
-
-        bufferedReader.close();
+        importKnownLocations(LocationRepository.getInstance(), dataPath);
     }
 
     public static void importKnownLocations(Lock lock, String dataPath) throws IOException {
@@ -48,6 +60,20 @@ public class FileManagementService {
 
         lock.unlock();
 
+        importKnownLocations(locationRepository, dataPath);
+    }
+
+    public static void importKnownLocations(Semaphore semaphore, String dataPath) throws IOException, InterruptedException {
+        semaphore.acquire();
+
+        LocationRepository locationRepository = LocationRepository.getInstance();
+
+        semaphore.release();
+
+        importKnownLocations(locationRepository, dataPath);
+    }
+
+    public static void importKnownLocations(LocationRepository locationRepository, String dataPath) throws IOException {
         BufferedReader bufferedReader = newBufferedReader(Path.of(HOME + dataPath));
 
         String line;
@@ -63,36 +89,11 @@ public class FileManagementService {
         bufferedReader.close();
     }
 
-    public static void importRandomData() throws IOException {
-        importKnownLocations("databases//random_data.csv");
-    }
-
-    public static void importRandomData(Lock lock) throws IOException, InterruptedException {
-        importKnownLocations(lock, "databases//random_data.csv");
-    }
-
-    public static void importTrueData() throws IOException {
-        importKnownLocations("databases//true_data.csv");
-    }
-
-    public static void importTrueData(Lock lock) throws IOException, InterruptedException {
-        importKnownLocations(lock, "databases//true_data.csv");
-    }
 
     public static void importUnknownLocations() throws IOException {
         LocationRepository locationRepository = LocationRepository.getInstance();
 
-        BufferedReader bufferedReader = newBufferedReader(Path.of(HOME + "unknown_locations.csv"));
-
-        String line;
-
-        while((line = bufferedReader.readLine()) != null){
-            String[] information = line.split(";");
-
-            locationRepository.addUnknownPoint(new UnknownPoint(Double.parseDouble(information[0]), Double.parseDouble(information[1])));
-        }
-
-        bufferedReader.close();
+        importUnknownLocations(locationRepository);
     }
 
     public static void importUnknownLocations(Lock lock) throws IOException {
@@ -102,6 +103,20 @@ public class FileManagementService {
 
         lock.unlock();
 
+        importUnknownLocations(locationRepository);
+    }
+
+    public static void importUnknownLocations(Semaphore semaphore) throws IOException, InterruptedException {
+        semaphore.acquire();
+
+        LocationRepository locationRepository = LocationRepository.getInstance();
+
+        semaphore.release();
+
+        importUnknownLocations(locationRepository);
+    }
+
+    public static void importUnknownLocations(LocationRepository locationRepository) throws IOException {
         BufferedReader bufferedReader = newBufferedReader(Path.of(HOME + "unknown_locations.csv"));
 
         String line;
@@ -125,13 +140,7 @@ public class FileManagementService {
             createFile(exportationPath);
         }
 
-        BufferedWriter bufferedWriter = newBufferedWriter(exportationPath, StandardOpenOption.APPEND);
-
-        for(UnknownPoint unknownPoint : unknownPoints){
-            writeLine(bufferedWriter, unknownPoint);
-        }
-
-        bufferedWriter.close();
+        writeLines(exportationPath, unknownPoints);
     }
 
     public static void exportInterpolations(Lock lock, Collection<UnknownPoint> unknownPoints) throws IOException, InterruptedException {
@@ -143,7 +152,23 @@ public class FileManagementService {
 
         lock.unlock();
 
-        BufferedWriter bufferedWriter = newBufferedWriter(exportationPath, StandardOpenOption.APPEND);
+        writeLines(exportationPath, unknownPoints);
+    }
+
+    public static void exportInterpolations(Semaphore semaphore, Collection<UnknownPoint> unknownPoints) throws IOException, InterruptedException {
+        semaphore.acquire();
+
+        if(!exists(exportationPath)){
+            createFile(exportationPath);
+        }
+
+        semaphore.release();
+
+        writeLines(exportationPath, unknownPoints);
+    }
+
+    private static void writeLines(Path path, Collection<UnknownPoint> unknownPoints) throws IOException {
+        BufferedWriter bufferedWriter = newBufferedWriter(path, StandardOpenOption.APPEND);
 
         for(UnknownPoint unknownPoint : unknownPoints){
             writeLine(bufferedWriter, unknownPoint);
@@ -153,11 +178,7 @@ public class FileManagementService {
     }
 
     private static void writeLine(BufferedWriter bufferedWriter, UnknownPoint unknownPoint) throws IOException {
-        bufferedWriter.write(String.format("%.6f", unknownPoint.getLatitude()));
-        bufferedWriter.write(";");
-        bufferedWriter.write(String.format("%.6f", unknownPoint.getLongitude()));
-        bufferedWriter.write(";");
-        bufferedWriter.write(String.format("%.1f", unknownPoint.getTemperature()));
+        bufferedWriter.write(String.format("%.6f;%.6f;%.1f", unknownPoint.getLatitude(), unknownPoint.getLongitude(), unknownPoint.getTemperature()));
         bufferedWriter.newLine();
     }
 }

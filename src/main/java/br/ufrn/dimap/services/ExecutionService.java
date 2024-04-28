@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.util.Collection;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -17,11 +18,11 @@ public class ExecutionService {
     }
 
     public static void runPlatformThreads(Collection<Runnable> tasks) throws InterruptedException {
-        runPlatformThreads(tasks, Thread.MAX_PRIORITY);
+        runPlatformThreads(tasks, Thread.MIN_PRIORITY);
     }
 
     public static void runVirtualThreads(Collection<Runnable> tasks) throws InterruptedException {
-        runVirtualThreads(tasks, Thread.MAX_PRIORITY);
+        runVirtualThreads(tasks, Thread.MIN_PRIORITY);
     }
 
     public static void runPlatformThreads(Collection<Runnable> tasks, int priority) throws InterruptedException {
@@ -58,7 +59,7 @@ public class ExecutionService {
         return Set.of(importKnownPoints, importUnknownPoints);
     }
 
-    public static Set<Runnable> getImportationTasksForThreads() {
+    public static Set<Runnable> getMutexVersionOfImportationTasksForThreads() {
         Lock lock = new ReentrantLock();
 
         Runnable importKnownPoints = () -> {
@@ -73,6 +74,28 @@ public class ExecutionService {
             try {
                 FileManagementService.importUnknownLocations(lock);
             } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        };
+
+        return Set.of(importKnownPoints, importUnknownPoints);
+    }
+
+    public static Set<Runnable> getSemaphoreVersionOfImportationTasksForThreads() {
+        Semaphore semaphore = new Semaphore(1);
+
+        Runnable importKnownPoints = () -> {
+            try {
+                FileManagementService.importRandomData(semaphore);
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        };
+
+        Runnable importUnknownPoints = () -> {
+            try {
+                FileManagementService.importUnknownLocations(semaphore);
+            } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
         };
@@ -106,7 +129,7 @@ public class ExecutionService {
         return Set.of(firstTask);
     }
 
-    public static Set<Runnable> getExportationTasksForThreads() {
+    public static Set<Runnable> getMutexVersionOfExportationTasksForThreads() {
         Lock lock = new ReentrantLock();
 
         List<UnknownPoint> unknownPoints = LocationRepository.getInstance().getUnknownPoints().stream().toList();
@@ -130,6 +153,38 @@ public class ExecutionService {
         Runnable thirdTask = () -> {
             try {
                 FileManagementService.exportInterpolations(lock, unknownPoints.subList(unknownPoints.size() / 3 * 2, unknownPoints.size()));
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        };
+
+        return Set.of(firstTask, secondTask, thirdTask);
+    }
+
+    public static Set<Runnable> getSemaphoreVersionOfExportationTasksForThreads() {
+        Semaphore semaphore = new Semaphore(1);
+
+        List<UnknownPoint> unknownPoints = LocationRepository.getInstance().getUnknownPoints().stream().toList();
+
+        Runnable firstTask = () -> {
+            try {
+                FileManagementService.exportInterpolations(semaphore, unknownPoints.subList(0, unknownPoints.size() / 3));
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        };
+
+        Runnable secondTask = () -> {
+            try {
+                FileManagementService.exportInterpolations(semaphore, unknownPoints.subList(unknownPoints.size() / 3, unknownPoints.size() / 3 * 2));
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        };
+
+        Runnable thirdTask = () -> {
+            try {
+                FileManagementService.exportInterpolations(semaphore, unknownPoints.subList(unknownPoints.size() / 3 * 2, unknownPoints.size()));
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
