@@ -1,7 +1,7 @@
 package br.ufrn.dimap.application;
 
+import static br.ufrn.dimap.services.ExecutionService.getExportationTask;
 import static br.ufrn.dimap.services.ExecutionService.getInterpolationTasks;
-import static br.ufrn.dimap.services.ExecutionService.getMutexVersionOfExportationTasksForThreads;
 import static br.ufrn.dimap.services.ExecutionService.getMutexVersionOfImportationTasksForThreads;
 import static br.ufrn.dimap.services.ExecutionService.printResult;
 import static br.ufrn.dimap.services.ExecutionService.runPlatformThreads;
@@ -20,7 +20,7 @@ public class PlatformThreadsM {
         long checkpoint3 = System.currentTimeMillis();
 
         defineExportationPath();
-        runPlatformThreads(getMutexVersionOfExportationTasksForThreads());
+        runPlatformThreads(getExportationTask());
 
         long checkpoint4 = System.currentTimeMillis();
 

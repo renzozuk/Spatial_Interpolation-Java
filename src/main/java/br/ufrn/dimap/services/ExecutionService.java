@@ -15,16 +15,21 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 public class ExecutionService {
+    public static void runSerial(Runnable task) {
+        task.run();
+    }
+
     public static void runSerial(Collection<Runnable> tasks) {
         tasks.forEach(Runnable::run);
     }
 
-    public static void runPlatformThreads(Collection<Runnable> tasks) throws InterruptedException {
-        runPlatformThreads(tasks, Thread.MIN_PRIORITY);
+    public static void runPlatformThreads(Runnable task) throws InterruptedException {
+        Thread uniqueThread = Thread.ofPlatform().name(task.getClass().getSimpleName().split("/")[1]).start(task);
+        uniqueThread.join();
     }
 
-    public static void runVirtualThreads(Collection<Runnable> tasks) throws InterruptedException {
-        runVirtualThreads(tasks, Thread.MIN_PRIORITY);
+    public static void runPlatformThreads(Collection<Runnable> tasks) throws InterruptedException {
+        runPlatformThreads(tasks, Thread.MIN_PRIORITY);
     }
 
     public static void runPlatformThreads(Collection<Runnable> tasks, int priority) throws InterruptedException {
@@ -32,6 +37,15 @@ public class ExecutionService {
             thread.setPriority(priority);
             thread.join();
         }
+    }
+
+    public static void runVirtualThreads(Runnable task) throws InterruptedException {
+        Thread uniqueThread = Thread.ofVirtual().name(task.getClass().getSimpleName().split("/")[1]).start(task);
+        uniqueThread.join();
+    }
+
+    public static void runVirtualThreads(Collection<Runnable> tasks) throws InterruptedException {
+        runVirtualThreads(tasks, Thread.MIN_PRIORITY);
     }
 
     public static void runVirtualThreads(Collection<Runnable> tasks, int priority) throws InterruptedException {
@@ -67,7 +81,7 @@ public class ExecutionService {
         Runnable importKnownPoints = () -> {
             try {
                 FileManagementService.importRandomData(lock);
-            } catch (IOException | InterruptedException e) {
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         };
@@ -114,87 +128,19 @@ public class ExecutionService {
 
         Set<Runnable> tasks = new HashSet<>();
 
-        IntStream.range(0, quantity).forEach(i -> tasks.add(() -> {
-            InterpolationService.assignTemperatureToUnknownPoints(unknownPoints.subList(unknownPoints.size() / quantity * i, unknownPoints.size() / quantity * (i + 1)));
-        }));
+        IntStream.range(0, quantity).forEach(i -> tasks.add(() -> InterpolationService.assignTemperatureToUnknownPoints(unknownPoints.subList((int) Math.floor((double) unknownPoints.size() / quantity * i), (int) Math.floor((double) unknownPoints.size() / quantity * (i + 1))))));
 
         return tasks;
     }
 
-    public static Set<Runnable> getExportationTasksForSerial() {
-        Runnable firstTask = () -> {
+    public static Runnable getExportationTask() {
+        return () -> {
             try {
                 FileManagementService.exportInterpolations(LocationRepository.getInstance().getUnknownPoints());
             } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
         };
-
-        return Set.of(firstTask);
-    }
-
-    public static Set<Runnable> getMutexVersionOfExportationTasksForThreads() {
-        Lock lock = new ReentrantLock();
-
-        List<UnknownPoint> unknownPoints = LocationRepository.getInstance().getUnknownPoints().stream().toList();
-
-        Runnable firstTask = () -> {
-            try {
-                FileManagementService.exportInterpolations(lock, unknownPoints.subList(0, unknownPoints.size() / 3));
-            } catch (IOException | InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        };
-
-        Runnable secondTask = () -> {
-            try {
-                FileManagementService.exportInterpolations(lock, unknownPoints.subList(unknownPoints.size() / 3, unknownPoints.size() / 3 * 2));
-            } catch (IOException | InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        };
-
-        Runnable thirdTask = () -> {
-            try {
-                FileManagementService.exportInterpolations(lock, unknownPoints.subList(unknownPoints.size() / 3 * 2, unknownPoints.size()));
-            } catch (IOException | InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        };
-
-        return Set.of(firstTask, secondTask, thirdTask);
-    }
-
-    public static Set<Runnable> getSemaphoreVersionOfExportationTasksForThreads() {
-        Semaphore semaphore = new Semaphore(1);
-
-        List<UnknownPoint> unknownPoints = LocationRepository.getInstance().getUnknownPoints().stream().toList();
-
-        Runnable firstTask = () -> {
-            try {
-                FileManagementService.exportInterpolations(semaphore, unknownPoints.subList(0, unknownPoints.size() / 3));
-            } catch (IOException | InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        };
-
-        Runnable secondTask = () -> {
-            try {
-                FileManagementService.exportInterpolations(semaphore, unknownPoints.subList(unknownPoints.size() / 3, unknownPoints.size() / 3 * 2));
-            } catch (IOException | InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        };
-
-        Runnable thirdTask = () -> {
-            try {
-                FileManagementService.exportInterpolations(semaphore, unknownPoints.subList(unknownPoints.size() / 3 * 2, unknownPoints.size()));
-            } catch (IOException | InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        };
-
-        return Set.of(firstTask, secondTask, thirdTask);
     }
 
     public static void printResult(long checkpoint1, long checkpoint2) {

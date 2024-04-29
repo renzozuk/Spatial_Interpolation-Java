@@ -1,6 +1,6 @@
 package br.ufrn.dimap.application;
 
-import static br.ufrn.dimap.services.ExecutionService.getExportationTasksForSerial;
+import static br.ufrn.dimap.services.ExecutionService.getExportationTask;
 import static br.ufrn.dimap.services.ExecutionService.getImportationTasksForSerial;
 import static br.ufrn.dimap.services.ExecutionService.getInterpolationTasks;
 import static br.ufrn.dimap.services.ExecutionService.printResult;
@@ -20,7 +20,7 @@ public class Serial {
         long checkpoint3 = System.currentTimeMillis();
 
         defineExportationPath();
-        runSerial(getExportationTasksForSerial());
+        runSerial(getExportationTask());
 
         long checkpoint4 = System.currentTimeMillis();
 

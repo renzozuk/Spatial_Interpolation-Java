@@ -1,7 +1,7 @@
 package br.ufrn.dimap.application;
 
+import static br.ufrn.dimap.services.ExecutionService.getExportationTask;
 import static br.ufrn.dimap.services.ExecutionService.getInterpolationTasks;
-import static br.ufrn.dimap.services.ExecutionService.getSemaphoreVersionOfExportationTasksForThreads;
 import static br.ufrn.dimap.services.ExecutionService.getSemaphoreVersionOfImportationTasksForThreads;
 import static br.ufrn.dimap.services.ExecutionService.printResult;
 import static br.ufrn.dimap.services.ExecutionService.runVirtualThreads;
@@ -20,7 +20,7 @@ public class VirtualThreadsS {
         long checkpoint3 = System.currentTimeMillis();
 
         defineExportationPath();
-        runVirtualThreads(getSemaphoreVersionOfExportationTasksForThreads());
+        runVirtualThreads(getExportationTask());
 
         long checkpoint4 = System.currentTimeMillis();
 

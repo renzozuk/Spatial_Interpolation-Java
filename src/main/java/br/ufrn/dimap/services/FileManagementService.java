@@ -29,7 +29,7 @@ public class FileManagementService {
         importKnownLocations("databases//random_data.csv");
     }
 
-    public static void importRandomData(Lock lock) throws IOException, InterruptedException {
+    public static void importRandomData(Lock lock) throws IOException {
         importKnownLocations(lock, "databases//random_data.csv");
     }
 
@@ -139,30 +139,6 @@ public class FileManagementService {
         if(!exists(exportationPath)){
             createFile(exportationPath);
         }
-
-        writeLines(exportationPath, unknownPoints);
-    }
-
-    public static void exportInterpolations(Lock lock, Collection<UnknownPoint> unknownPoints) throws IOException, InterruptedException {
-        lock.lock();
-
-        if(!exists(exportationPath)){
-            createFile(exportationPath);
-        }
-
-        lock.unlock();
-
-        writeLines(exportationPath, unknownPoints);
-    }
-
-    public static void exportInterpolations(Semaphore semaphore, Collection<UnknownPoint> unknownPoints) throws IOException, InterruptedException {
-        semaphore.acquire();
-
-        if(!exists(exportationPath)){
-            createFile(exportationPath);
-        }
-
-        semaphore.release();
 
         writeLines(exportationPath, unknownPoints);
     }
