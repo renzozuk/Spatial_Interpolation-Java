@@ -5,12 +5,14 @@ import br.ufrn.dimap.repositories.LocationRepository;
 
 import java.io.IOException;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 public class ExecutionService {
     public static void runSerial(Collection<Runnable> tasks) {
@@ -104,17 +106,19 @@ public class ExecutionService {
     }
 
     public static Set<Runnable> getInterpolationTasks() {
+        return getInterpolationTasks(Runtime.getRuntime().availableProcessors());
+    }
+
+    public static Set<Runnable> getInterpolationTasks(int quantity) {
         List<UnknownPoint> unknownPoints = LocationRepository.getInstance().getUnknownPoints().stream().toList();
 
-        Runnable firstTask = () -> InterpolationService.assignTemperatureToUnknownPoints(unknownPoints.subList(0, unknownPoints.size() / 4));
+        Set<Runnable> tasks = new HashSet<>();
 
-        Runnable secondTask = () -> InterpolationService.assignTemperatureToUnknownPoints(unknownPoints.subList(unknownPoints.size() / 4, unknownPoints.size() / 2));
+        IntStream.range(0, quantity).forEach(i -> tasks.add(() -> {
+            InterpolationService.assignTemperatureToUnknownPoints(unknownPoints.subList(unknownPoints.size() / quantity * i, unknownPoints.size() / quantity * (i + 1)));
+        }));
 
-        Runnable thirdTask = () -> InterpolationService.assignTemperatureToUnknownPoints(unknownPoints.subList(unknownPoints.size() / 2, unknownPoints.size() / 4 * 3));
-
-        Runnable fourthTask = () -> InterpolationService.assignTemperatureToUnknownPoints(unknownPoints.subList(unknownPoints.size() / 4 * 3, unknownPoints.size()));
-
-        return Set.of(firstTask, secondTask, thirdTask, fourthTask);
+        return tasks;
     }
 
     public static Set<Runnable> getExportationTasksForSerial() {
