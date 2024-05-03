@@ -37,6 +37,10 @@ public class FileManagementService {
         importKnownLocations(semaphore, "databases//random_data.csv");
     }
 
+    public static void importRandomData(LocationRepository locationRepository) throws IOException {
+        importKnownLocations(locationRepository, "databases//random_data.csv");
+    }
+
     public static void importTrueData() throws IOException {
         importKnownLocations("databases//true_data.csv");
     }
@@ -47,6 +51,10 @@ public class FileManagementService {
 
     public static void importTrueData(Semaphore semaphore) throws IOException, InterruptedException {
         importKnownLocations(semaphore, "databases//true_data.csv");
+    }
+
+    public static void importTrueData(LocationRepository locationRepository) throws IOException {
+        importKnownLocations(locationRepository, "databases//true_data.csv");
     }
 
     public static void importKnownLocations(String dataPath) throws IOException {
@@ -89,11 +97,8 @@ public class FileManagementService {
         bufferedReader.close();
     }
 
-
     public static void importUnknownLocations() throws IOException {
-        LocationRepository locationRepository = LocationRepository.getInstance();
-
-        importUnknownLocations(locationRepository);
+        importUnknownLocations(LocationRepository.getInstance());
     }
 
     public static void importUnknownLocations(Lock lock) throws IOException {

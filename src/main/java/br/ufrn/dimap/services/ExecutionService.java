@@ -9,6 +9,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.concurrent.Semaphore;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
@@ -112,6 +113,26 @@ public class ExecutionService {
             try {
                 FileManagementService.importUnknownLocations(semaphore);
             } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        };
+
+        return Set.of(importKnownPoints, importUnknownPoints);
+    }
+
+    public static Set<Runnable> getAtomicVersionOfImportationTasksForThreads() {
+        Runnable importKnownPoints = () -> {
+            try {
+                FileManagementService.importRandomData(LocationRepository.getAtomicInstance());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+        };
+
+        Runnable importUnknownPoints = () -> {
+            try {
+                FileManagementService.importUnknownLocations(LocationRepository.getAtomicInstance());
+            } catch (IOException e) {
                 throw new RuntimeException(e);
             }
         };

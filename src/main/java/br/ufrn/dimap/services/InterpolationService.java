@@ -4,7 +4,7 @@ import br.ufrn.dimap.entities.KnownPoint;
 import br.ufrn.dimap.entities.UnknownPoint;
 import br.ufrn.dimap.repositories.LocationRepository;
 
-import java.util.List;
+import java.util.Collection;
 
 public class InterpolationService {
     public static void assignTemperatureToUnknownPoint(UnknownPoint unknownPoint) {
@@ -20,7 +20,7 @@ public class InterpolationService {
         unknownPoint.setTemperature(numerator / denominator);
     }
 
-    public static void assignTemperatureToUnknownPoints(List<UnknownPoint> unknownPoints) {
+    public static void assignTemperatureToUnknownPoints(Collection<UnknownPoint> unknownPoints) {
         unknownPoints.forEach(InterpolationService::assignTemperatureToUnknownPoint);
     }
 }

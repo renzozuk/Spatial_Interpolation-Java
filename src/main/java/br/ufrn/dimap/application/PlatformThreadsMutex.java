@@ -2,16 +2,16 @@ package br.ufrn.dimap.application;
 
 import static br.ufrn.dimap.services.ExecutionService.getExportationTask;
 import static br.ufrn.dimap.services.ExecutionService.getInterpolationTasks;
-import static br.ufrn.dimap.services.ExecutionService.getSemaphoreVersionOfImportationTasksForThreads;
+import static br.ufrn.dimap.services.ExecutionService.getMutexVersionOfImportationTasksForThreads;
 import static br.ufrn.dimap.services.ExecutionService.printResult;
 import static br.ufrn.dimap.services.ExecutionService.runPlatformThreads;
 import static br.ufrn.dimap.services.FileManagementService.defineExportationPath;
 
-public class PlatformThreadsS {
+public class PlatformThreadsMutex {
     public static void main(String[] args) throws InterruptedException {
         long checkpoint1 = System.currentTimeMillis();
 
-        runPlatformThreads(getSemaphoreVersionOfImportationTasksForThreads());
+        runPlatformThreads(getMutexVersionOfImportationTasksForThreads());
 
         long checkpoint2 = System.currentTimeMillis();
 

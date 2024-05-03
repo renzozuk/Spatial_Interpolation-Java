@@ -5,9 +5,11 @@ import br.ufrn.dimap.entities.UnknownPoint;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 
 public class LocationRepository {
     private static LocationRepository instance;
+    private static AtomicReference<LocationRepository> atomicInstance;
     private final Set<KnownPoint> knownPoints;
     private final Set<UnknownPoint> unknownPoints;
 
@@ -16,12 +18,32 @@ public class LocationRepository {
         unknownPoints = new HashSet<>();
     }
 
+    private static LocationRepository getNotNullInstance() {
+        if (instance != null) {
+            return instance;
+        }
+
+        if (atomicInstance != null) {
+            return atomicInstance.get();
+        }
+
+        return null;
+    }
+
     public static LocationRepository getInstance() {
-        if (instance == null) {
+        if (instance == null && atomicInstance == null) {
             instance = new LocationRepository();
         }
 
-        return instance;
+        return getNotNullInstance();
+    }
+
+    public static LocationRepository getAtomicInstance() {
+        if (instance == null && atomicInstance == null) {
+            atomicInstance = new AtomicReference<>(new LocationRepository());
+        }
+
+        return getNotNullInstance();
     }
 
     public Set<KnownPoint> getKnownPoints() {
