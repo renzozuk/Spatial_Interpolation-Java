@@ -8,7 +8,7 @@ public abstract class Point {
     private Double temperature;
 
     public Point(double latitude, double longitude) {
-        if(latitude < -90.0 || latitude > 90.00){
+        if(latitude < -90.00 || latitude > 90.00){
             throw new IllegalArgumentException("Invalid value for latitude. Note that the latitude value must be between -90 and 90.");
         }
 

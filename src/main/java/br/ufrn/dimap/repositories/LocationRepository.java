@@ -4,10 +4,13 @@ import br.ufrn.dimap.entities.KnownPoint;
 import br.ufrn.dimap.entities.UnknownPoint;
 
 import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class LocationRepository {
-    private static LocationRepository instance;
+    private static final LocationRepository instance = new LocationRepository();
     private final Set<KnownPoint> knownPoints;
     private final Set<UnknownPoint> unknownPoints;
 
@@ -17,19 +20,19 @@ public class LocationRepository {
     }
 
     public static LocationRepository getInstance() {
-        if (instance == null) {
-            instance = new LocationRepository();
-        }
-
         return instance;
     }
 
-    public Set<KnownPoint> getKnownPoints() {
-        return knownPoints;
+    public Iterator<KnownPoint> getKnownPointsIterator() {
+        return knownPoints.iterator();
     }
 
     public Set<UnknownPoint> getUnknownPoints() {
-        return unknownPoints;
+        return unknownPoints.stream().collect(Collectors.toUnmodifiableSet());
+    }
+
+    public List<UnknownPoint> getUnknownPointsAsAList() {
+        return unknownPoints.stream().toList();
     }
 
     public void addKnownPoint(KnownPoint knownPoint) {

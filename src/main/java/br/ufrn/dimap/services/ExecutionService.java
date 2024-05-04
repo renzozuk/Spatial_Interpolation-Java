@@ -124,7 +124,7 @@ public class ExecutionService {
     }
 
     public static Set<Runnable> getInterpolationTasks(int quantity) {
-        List<UnknownPoint> unknownPoints = LocationRepository.getInstance().getUnknownPoints().stream().toList();
+        List<UnknownPoint> unknownPoints = LocationRepository.getInstance().getUnknownPointsAsAList();
 
         Set<Runnable> tasks = new HashSet<>();
 
