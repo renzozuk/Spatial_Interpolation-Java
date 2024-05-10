@@ -8,9 +8,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -75,12 +72,10 @@ public class ExecutionService {
         return Set.of(importKnownPoints, importUnknownPoints);
     }
 
-    public static Set<Runnable> getMutexVersionOfImportationTasksForThreads() {
-        Lock lock = new ReentrantLock();
-
+    public static Set<Runnable> getAtomicVersionOfImportationTasksForThreads() {
         Runnable importKnownPoints = () -> {
             try {
-                FileManagementService.importRandomData(lock);
+                FileManagementService.importRandomData();
             } catch (IOException e) {
                 throw new RuntimeException(e);
             }
@@ -88,30 +83,8 @@ public class ExecutionService {
 
         Runnable importUnknownPoints = () -> {
             try {
-                FileManagementService.importUnknownLocations(lock);
+                FileManagementService.importUnknownLocations();
             } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        };
-
-        return Set.of(importKnownPoints, importUnknownPoints);
-    }
-
-    public static Set<Runnable> getSemaphoreVersionOfImportationTasksForThreads() {
-        Semaphore semaphore = new Semaphore(1);
-
-        Runnable importKnownPoints = () -> {
-            try {
-                FileManagementService.importRandomData(semaphore);
-            } catch (IOException | InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        };
-
-        Runnable importUnknownPoints = () -> {
-            try {
-                FileManagementService.importUnknownLocations(semaphore);
-            } catch (IOException | InterruptedException e) {
                 throw new RuntimeException(e);
             }
         };

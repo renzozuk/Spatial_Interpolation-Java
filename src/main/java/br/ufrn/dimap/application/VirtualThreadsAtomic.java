@@ -2,16 +2,16 @@ package br.ufrn.dimap.application;
 
 import static br.ufrn.dimap.services.ExecutionService.getExportationTask;
 import static br.ufrn.dimap.services.ExecutionService.getInterpolationTasks;
-import static br.ufrn.dimap.services.ExecutionService.getSemaphoreVersionOfImportationTasksForThreads;
+import static br.ufrn.dimap.services.ExecutionService.getAtomicVersionOfImportationTasksForThreads;
 import static br.ufrn.dimap.services.ExecutionService.printResult;
 import static br.ufrn.dimap.services.ExecutionService.runVirtualThreads;
 import static br.ufrn.dimap.services.FileManagementService.defineExportationPath;
 
-public class VirtualThreadsSemaphore {
+public class VirtualThreadsAtomic {
     public static void main(String[] args) throws InterruptedException {
         long checkpoint1 = System.currentTimeMillis();
 
-        runVirtualThreads(getSemaphoreVersionOfImportationTasksForThreads());
+        runVirtualThreads(getAtomicVersionOfImportationTasksForThreads());
 
         long checkpoint2 = System.currentTimeMillis();
 

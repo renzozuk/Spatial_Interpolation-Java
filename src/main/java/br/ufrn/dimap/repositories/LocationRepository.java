@@ -7,10 +7,11 @@ import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class LocationRepository {
-    private static final LocationRepository instance = new LocationRepository();
+    private static final AtomicReference<LocationRepository> atomicInstance = new AtomicReference<>(new LocationRepository());
     private final Set<KnownPoint> knownPoints;
     private final Set<UnknownPoint> unknownPoints;
 
@@ -20,7 +21,7 @@ public class LocationRepository {
     }
 
     public static LocationRepository getInstance() {
-        return instance;
+        return atomicInstance.get();
     }
 
     public Iterator<KnownPoint> getKnownPointsIterator() {
