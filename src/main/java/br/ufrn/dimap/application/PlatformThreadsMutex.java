@@ -9,20 +9,20 @@ import static br.ufrn.dimap.services.FileManagementService.defineExportationPath
 
 public class PlatformThreadsMutex {
     public static void main(String[] args) throws InterruptedException {
-        long checkpoint1 = System.currentTimeMillis();
+        final long checkpoint1 = System.currentTimeMillis();
 
         runPlatformThreads(getMutexVersionOfImportationTasksForThreads());
 
-        long checkpoint2 = System.currentTimeMillis();
+        final long checkpoint2 = System.currentTimeMillis();
 
         runPlatformThreads(getInterpolationTasks());
 
-        long checkpoint3 = System.currentTimeMillis();
+        final long checkpoint3 = System.currentTimeMillis();
 
         defineExportationPath();
         runPlatformThreads(getExportationTask());
 
-        long checkpoint4 = System.currentTimeMillis();
+        final long checkpoint4 = System.currentTimeMillis();
 
         printResult(checkpoint1, checkpoint2, checkpoint3, checkpoint4);
     }

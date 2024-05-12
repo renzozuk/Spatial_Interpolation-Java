@@ -9,20 +9,20 @@ import static br.ufrn.dimap.services.FileManagementService.defineExportationPath
 
 public class Serial {
     public static void main(String[] args) {
-        long checkpoint1 = System.currentTimeMillis();
+        final long checkpoint1 = System.currentTimeMillis();
 
         runSerial(getImportationTasksForSerial());
 
-        long checkpoint2 = System.currentTimeMillis();
+        final long checkpoint2 = System.currentTimeMillis();
 
         runSerial(getInterpolationTasks());
 
-        long checkpoint3 = System.currentTimeMillis();
+        final long checkpoint3 = System.currentTimeMillis();
 
         defineExportationPath();
         runSerial(getExportationTask());
 
-        long checkpoint4 = System.currentTimeMillis();
+        final long checkpoint4 = System.currentTimeMillis();
 
         printResult(checkpoint1, checkpoint2, checkpoint3, checkpoint4);
     }

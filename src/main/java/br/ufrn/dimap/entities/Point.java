@@ -3,8 +3,8 @@ package br.ufrn.dimap.entities;
 import java.util.Objects;
 
 public abstract class Point {
-    private double latitude;
-    private double longitude;
+    private final double latitude;
+    private final double longitude;
     private Double temperature;
 
     public Point(double latitude, double longitude) {
