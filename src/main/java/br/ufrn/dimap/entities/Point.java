@@ -5,7 +5,7 @@ import java.util.Objects;
 public abstract class Point {
     private final double latitude;
     private final double longitude;
-    private Double temperature;
+    private double temperature;
 
     public Point(double latitude, double longitude) {
         if(latitude < -90.00 || latitude > 90.00){
@@ -20,7 +20,7 @@ public abstract class Point {
         this.longitude = longitude;
     }
 
-    public Point(double latitude, double longitude, Double temperature) {
+    public Point(double latitude, double longitude, double temperature) {
         this(latitude, longitude);
         this.temperature = temperature;
     }
@@ -33,26 +33,26 @@ public abstract class Point {
         return longitude;
     }
 
-    public Double getTemperature() {
+    public double getTemperature() {
         return temperature;
     }
 
-    public void setTemperature(Double temperature) {
+    public void setTemperature(double temperature) {
         if(this instanceof UnknownPoint){
             this.temperature = temperature;
         }
     }
 
-    public boolean equals(Object object) {
-        if (this == object) return true;
-        if (object == null || getClass() != object.getClass()) return false;
-        if (!super.equals(object)) return false;
-        Point point = (Point) object;
-        return java.lang.Double.compare(latitude, point.latitude) == 0 && java.lang.Double.compare(longitude, point.longitude) == 0;
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof Point point)) return false;
+        return latitude == point.latitude && longitude == point.longitude;
     }
 
+    @Override
     public int hashCode() {
-        return Objects.hash(super.hashCode(), latitude, longitude);
+        return Objects.hash(latitude, longitude);
     }
 
     public double getDistanceFromAnotherPoint(Point point){
@@ -62,6 +62,7 @@ public abstract class Point {
 
         double latitudeDistance = point.getLatitude() * Math.PI / 180 - latitude * Math.PI / 180;
         double longitudeDistance = point.getLongitude() * Math.PI / 180 - longitude * Math.PI / 180;
+
         double a = Math.sin(latitudeDistance / 2) * Math.sin(latitudeDistance / 2) +
                 Math.cos(latitude * Math.PI / 180) * Math.cos(point.getLatitude() * Math.PI / 180) *
                 Math.sin(longitudeDistance / 2) * Math.sin(longitudeDistance / 2);
