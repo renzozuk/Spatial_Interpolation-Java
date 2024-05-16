@@ -46,4 +46,8 @@ public class InterpolationService {
     public static void assignTemperatureToUnknownPoints(Collection<UnknownPoint> unknownPoints) {
         unknownPoints.forEach(InterpolationService::assignTemperatureToUnknownPoint);
     }
+
+    public static void assignTemperatureToUnknownPointThroughList(Collection<UnknownPoint> unknownPoints) {
+        unknownPoints.forEach(InterpolationService::assignTemperatureToUnknownPointThroughList);
+    }
 }
