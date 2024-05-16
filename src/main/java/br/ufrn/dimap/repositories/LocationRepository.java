@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 public class LocationRepository {
-    private static final AtomicReference<LocationRepository> atomicInstance = new AtomicReference<>(new LocationRepository());
+    private static final LocationRepository instance = new LocationRepository();
     private final Set<KnownPoint> knownPoints;
     private final Set<UnknownPoint> unknownPoints;
 
@@ -18,7 +18,7 @@ public class LocationRepository {
     }
 
     public static LocationRepository getInstance() {
-        return atomicInstance.get();
+        return atomicInstance;
     }
 
     public Iterator<KnownPoint> getKnownPointsIterator() {
