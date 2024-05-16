@@ -36,19 +36,17 @@ public class FileManagementService {
     }
 
     public static void importKnownLocations(LocationRepository locationRepository, String dataPath) throws IOException {
-        BufferedReader bufferedReader = newBufferedReader(Path.of(HOME + dataPath));
+        try (BufferedReader bufferedReader = newBufferedReader(Path.of(HOME + dataPath))) {
+            String line;
 
-        String line;
+            while((line = bufferedReader.readLine()) != null){
+                String[] information = line.split(";");
 
-        while((line = bufferedReader.readLine()) != null){
-            String[] information = line.split(";");
-
-            try{
-                locationRepository.addKnownPoint(new KnownPoint(Double.parseDouble(information[0]), Double.parseDouble(information[1]), Double.parseDouble(information[2])));
-            }catch(NumberFormatException ignored){}
+                try{
+                    locationRepository.addKnownPoint(new KnownPoint(Double.parseDouble(information[0]), Double.parseDouble(information[1]), Double.parseDouble(information[2])));
+                }catch(NumberFormatException ignored){}
+            }
         }
-
-        bufferedReader.close();
     }
 
     public static void importUnknownLocations() throws IOException {
