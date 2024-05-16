@@ -29,6 +29,20 @@ public class InterpolationService {
         unknownPoint.setTemperature(numerator / denominator);
     }
 
+    public static void assignTemperatureToUnknownPointThroughList(UnknownPoint unknownPoint) {
+        double numerator = 0.0;
+        double denominator = 0.0;
+
+        for(KnownPoint knownPoint : LocationRepository.getInstance().getKnownPointsAsAList()){
+            double dpp = pow(unknownPoint.getDistanceFromAnotherPoint(knownPoint), 3);
+
+            numerator += knownPoint.getTemperature() / dpp;
+            denominator += 1 / dpp;
+        }
+
+        unknownPoint.setTemperature(numerator / denominator);
+    }
+
     public static void assignTemperatureToUnknownPoints(Collection<UnknownPoint> unknownPoints) {
         unknownPoints.forEach(InterpolationService::assignTemperatureToUnknownPoint);
     }
