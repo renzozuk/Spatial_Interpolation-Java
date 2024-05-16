@@ -3,8 +3,10 @@ package br.ufrn.dimap.repositories;
 import br.ufrn.dimap.entities.KnownPoint;
 import br.ufrn.dimap.entities.UnknownPoint;
 
-import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class LocationRepository {
@@ -18,7 +20,7 @@ public class LocationRepository {
     }
 
     public static LocationRepository getInstance() {
-        return atomicInstance;
+        return instance;
     }
 
     public Iterator<KnownPoint> getKnownPointsIterator() {
