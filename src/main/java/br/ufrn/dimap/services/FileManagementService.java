@@ -13,8 +13,6 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
-import java.util.concurrent.Semaphore;
-import java.util.concurrent.locks.Lock;
 
 import static java.nio.file.Files.createFile;
 import static java.nio.file.Files.exists;
@@ -29,89 +27,30 @@ public class FileManagementService {
         importKnownLocations("databases//random_data.csv");
     }
 
-    public static void importRandomData(Lock lock) throws IOException {
-        importKnownLocations(lock, "databases//random_data.csv");
-    }
-
-    public static void importRandomData(Semaphore semaphore) throws IOException, InterruptedException {
-        importKnownLocations(semaphore, "databases//random_data.csv");
-    }
-
     public static void importTrueData() throws IOException {
         importKnownLocations("databases//true_data.csv");
-    }
-
-    public static void importTrueData(Lock lock) throws IOException {
-        importKnownLocations(lock, "databases//true_data.csv");
-    }
-
-    public static void importTrueData(Semaphore semaphore) throws IOException, InterruptedException {
-        importKnownLocations(semaphore, "databases//true_data.csv");
     }
 
     public static void importKnownLocations(String dataPath) throws IOException {
         importKnownLocations(LocationRepository.getInstance(), dataPath);
     }
 
-    public static void importKnownLocations(Lock lock, String dataPath) throws IOException {
-        lock.lock();
-
-        LocationRepository locationRepository = LocationRepository.getInstance();
-
-        lock.unlock();
-
-        importKnownLocations(locationRepository, dataPath);
-    }
-
-    public static void importKnownLocations(Semaphore semaphore, String dataPath) throws IOException, InterruptedException {
-        semaphore.acquire();
-
-        LocationRepository locationRepository = LocationRepository.getInstance();
-
-        semaphore.release();
-
-        importKnownLocations(locationRepository, dataPath);
-    }
-
     public static void importKnownLocations(LocationRepository locationRepository, String dataPath) throws IOException {
-        BufferedReader bufferedReader = newBufferedReader(Path.of(HOME + dataPath));
+        try (BufferedReader bufferedReader = newBufferedReader(Path.of(HOME + dataPath))) {
+            String line;
 
-        String line;
+            while((line = bufferedReader.readLine()) != null){
+                String[] information = line.split(";");
 
-        while((line = bufferedReader.readLine()) != null){
-            String[] information = line.split(";");
-
-            try{
-                locationRepository.addKnownPoint(new KnownPoint(Double.parseDouble(information[0]), Double.parseDouble(information[1]), Double.parseDouble(information[2])));
-            }catch(NumberFormatException ignored){}
+                try{
+                    locationRepository.addKnownPoint(new KnownPoint(Double.parseDouble(information[0]), Double.parseDouble(information[1]), Double.parseDouble(information[2])));
+                }catch(NumberFormatException ignored){}
+            }
         }
-
-        bufferedReader.close();
     }
-
 
     public static void importUnknownLocations() throws IOException {
         LocationRepository locationRepository = LocationRepository.getInstance();
-
-        importUnknownLocations(locationRepository);
-    }
-
-    public static void importUnknownLocations(Lock lock) throws IOException {
-        lock.lock();
-
-        LocationRepository locationRepository = LocationRepository.getInstance();
-
-        lock.unlock();
-
-        importUnknownLocations(locationRepository);
-    }
-
-    public static void importUnknownLocations(Semaphore semaphore) throws IOException, InterruptedException {
-        semaphore.acquire();
-
-        LocationRepository locationRepository = LocationRepository.getInstance();
-
-        semaphore.release();
 
         importUnknownLocations(locationRepository);
     }
