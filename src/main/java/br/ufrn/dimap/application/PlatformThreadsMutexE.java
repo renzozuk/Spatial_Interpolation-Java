@@ -1,7 +1,7 @@
 package br.ufrn.dimap.application;
 
 import static br.ufrn.dimap.services.ExecutionService.getExportationTask;
-import static br.ufrn.dimap.services.ExecutionService.getInterpolationTasks;
+import static br.ufrn.dimap.services.ExecutionService.getInterpolationTasksPerUnknownPointsQuantity;
 import static br.ufrn.dimap.services.ExecutionService.getMutexVersionOfImportationTasksForThreads;
 import static br.ufrn.dimap.services.ExecutionService.printResult;
 import static br.ufrn.dimap.services.ExecutionService.runPlatformThreadsUsingExecutor;
@@ -15,7 +15,7 @@ public class PlatformThreadsMutexE {
 
         final long checkpoint2 = System.currentTimeMillis();
 
-        runPlatformThreadsUsingExecutor(getInterpolationTasks());
+        runPlatformThreadsUsingExecutor(getInterpolationTasksPerUnknownPointsQuantity());
 
         final long checkpoint3 = System.currentTimeMillis();
 

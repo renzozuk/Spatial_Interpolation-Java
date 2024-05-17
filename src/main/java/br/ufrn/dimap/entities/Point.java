@@ -55,6 +55,15 @@ public abstract class Point {
         return Objects.hash(latitude, longitude);
     }
 
+    @Override
+    public String toString() {
+        return "Point{" +
+                "latitude=" + latitude +
+                ", longitude=" + longitude +
+                ", temperature=" + temperature +
+                '}';
+    }
+
     public double getDistanceFromAnotherPoint(Point point){
         if(this == point){
             return 0.0;

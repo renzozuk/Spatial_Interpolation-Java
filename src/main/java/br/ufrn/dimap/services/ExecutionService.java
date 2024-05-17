@@ -7,7 +7,9 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -15,6 +17,7 @@ import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 import static br.ufrn.dimap.repositories.LocationRepository.getInstance;
+import static java.lang.Runtime.getRuntime;
 
 public class ExecutionService {
     public static void runSerial(Runnable task) {
@@ -149,6 +152,34 @@ public class ExecutionService {
         return Set.of(importKnownPoints, importUnknownPoints);
     }
 
+    public static Set<Future<String>> importThroughPlatformThreadsAndCallable() {
+        try(var executionService = Executors.newSingleThreadExecutor()){
+            Set<Future<String>> futures = new HashSet<>();
+
+            futures.add(executionService.submit(() -> {
+                try {
+                    FileManagementService.importRandomData();
+
+                    return "Known points imported successfully.";
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }));
+
+            futures.add(executionService.submit(() -> {
+                try {
+                    FileManagementService.importUnknownLocations();
+
+                    return "Unknown points imported successfully.";
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }));
+
+            return futures;
+        }
+    }
+
     public static Set<Runnable> getInterpolationTasks() {
         return getInterpolationTasks(Runtime.getRuntime().availableProcessors());
     }
@@ -163,6 +194,39 @@ public class ExecutionService {
         return tasks;
     }
 
+    public static Set<Runnable> getInterpolationTasksPerUnknownPointsQuantity() {
+        return getInstance().getUnknownPoints().stream().map(up -> (Runnable) () -> InterpolationService.assignTemperatureToUnknownPoint(up)).collect(Collectors.toUnmodifiableSet());
+    }
+
+    public static Set<Future<UnknownPoint>> interpolateThroughPlatformThreadsAndCallable() {
+        try(var executionService = Executors.newFixedThreadPool(getRuntime().availableProcessors())){
+            Set<Future<UnknownPoint>> futures = new HashSet<>();
+
+            for(UnknownPoint unknownPoint : getInstance().getUnknownPoints()){
+                futures.add(executionService.submit(InterpolationService.getInterpolationCallable(unknownPoint)));
+            }
+
+            return futures;
+        }
+    }
+
+    public static Set<Future<UnknownPoint>> interpolateThroughVirtualThreadsAndCallable() {
+        try(var executionService = Executors.newVirtualThreadPerTaskExecutor()){
+            Set<Future<UnknownPoint>> futureResult = new HashSet<>();
+
+            for(UnknownPoint unknownPoint : getInstance().getUnknownPoints()){
+                futureResult.add(executionService.submit(InterpolationService.getInterpolationCallable(unknownPoint)));
+            }
+
+            return futureResult;
+        }
+    }
+
+    public static void runInterpolationAction() {
+        InterpolationAction interpolationAction = new InterpolationAction();
+        interpolationAction.compute();
+    }
+
     public static Runnable getExportationTask() {
         return () -> {
             try {
@@ -171,6 +235,32 @@ public class ExecutionService {
                 throw new RuntimeException(e);
             }
         };
+    }
+
+    public static Set<Future<UnknownPoint>> exportThroughPlatformThreadsAndCallable() {
+        try(var executionService = Executors.newSingleThreadExecutor()){
+            Set<Future<UnknownPoint>> futures = new HashSet<>();
+
+            for(UnknownPoint unknownPoint : getInstance().getUnknownPoints()){
+                futures.add(executionService.submit(FileManagementService.getExportationCallable(unknownPoint)));
+            }
+
+            return futures;
+        }
+    }
+
+    public static void printResult(Collection<Future<String>> importationFutures, Collection<Future<UnknownPoint>> interpolationFutures, Collection<Future<UnknownPoint>> exportationFutures) throws ExecutionException, InterruptedException {
+        for(Future<String> future : importationFutures){
+            System.out.println(future.get());
+        }
+
+        for(Future<UnknownPoint> future : interpolationFutures){
+            System.out.println(future.get());
+        }
+
+        for(Future<UnknownPoint> future : exportationFutures){
+            System.out.println(future.get());
+        }
     }
 
     public static void printResult(long checkpoint1, long checkpoint2) {

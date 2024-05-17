@@ -13,6 +13,7 @@ import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Collection;
+import java.util.concurrent.Callable;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.locks.Lock;
 
@@ -135,6 +136,22 @@ public class FileManagementService {
         exportationPath = Path.of(HOME + "output//exported_locations_" + String.format("%04d.%02d.%02d-%02d.%02d.%02d.csv", zdt.getYear(), zdt.getMonthValue(), zdt.getDayOfMonth(), zdt.getHour(), zdt.getMinute(), zdt.getSecond()));
     }
 
+    public static Callable<UnknownPoint> getExportationCallable(UnknownPoint unknownPoint) {
+        return () -> {
+            exportInterpolation(unknownPoint);
+
+            return unknownPoint;
+        };
+    }
+
+    public static void exportInterpolation(UnknownPoint unknownPoint) throws IOException {
+        if(!exists(exportationPath)){
+            createFile(exportationPath);
+        }
+
+        writeLine(exportationPath, unknownPoint);
+    }
+
     public static void exportInterpolations(Collection<UnknownPoint> unknownPoints) throws IOException, InterruptedException {
         if(!exists(exportationPath)){
             createFile(exportationPath);
@@ -149,6 +166,15 @@ public class FileManagementService {
         for(UnknownPoint unknownPoint : unknownPoints){
             writeLine(bufferedWriter, unknownPoint);
         }
+
+        bufferedWriter.close();
+    }
+
+    private static void writeLine(Path path, UnknownPoint unknownPoint) throws IOException {
+        BufferedWriter bufferedWriter = newBufferedWriter(path, StandardOpenOption.APPEND);
+
+        bufferedWriter.write(String.format("%.6f;%.6f;%.1f", unknownPoint.getLatitude(), unknownPoint.getLongitude(), unknownPoint.getTemperature()));
+        bufferedWriter.newLine();
 
         bufferedWriter.close();
     }
