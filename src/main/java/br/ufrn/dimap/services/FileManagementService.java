@@ -90,7 +90,6 @@ public class FileManagementService {
         bufferedReader.close();
     }
 
-
     public static void importUnknownLocations() throws IOException {
         LocationRepository locationRepository = LocationRepository.getInstance();
 

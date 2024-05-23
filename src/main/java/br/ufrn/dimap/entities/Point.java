@@ -2,6 +2,8 @@ package br.ufrn.dimap.entities;
 
 import java.util.Objects;
 
+import static br.ufrn.dimap.util.Math.pow;
+
 public abstract class Point {
     private final double latitude;
     private final double longitude;

@@ -21,10 +21,10 @@ public class InterpolationService {
             KnownPoint knownPoint = knownPointsIterator.next();
 
 //            3 is power parameter
-            double dpp = pow(unknownPoint.getDistanceFromAnotherPoint(knownPoint), 3);
+            double distancePoweredToPowerParameter = pow(unknownPoint.getDistanceFromAnotherPoint(knownPoint), 3);
 
-            numerator += knownPoint.getTemperature() / dpp;
-            denominator += 1 / dpp;
+            numerator += knownPoint.getTemperature() / distancePoweredToPowerParameter;
+            denominator += 1 / distancePoweredToPowerParameter;
         }
 
         unknownPoint.setTemperature(numerator / denominator);
@@ -32,6 +32,10 @@ public class InterpolationService {
 
     public static void assignTemperatureToUnknownPoints(Collection<UnknownPoint> unknownPoints) {
         unknownPoints.forEach(InterpolationService::assignTemperatureToUnknownPoint);
+    }
+
+    public static void assignTemperatureToUnknownPointsInParallel(Collection<UnknownPoint> unknownPoints) {
+        unknownPoints.parallelStream().forEach(InterpolationService::assignTemperatureToUnknownPoint);
     }
 
     public static Callable<UnknownPoint> getInterpolationCallable(UnknownPoint unknownPoint) {
@@ -44,11 +48,11 @@ public class InterpolationService {
             while(knownPointsIterator.hasNext()){
                 KnownPoint knownPoint = knownPointsIterator.next();
 
-//            3 is power parameter
-                double dpp = pow(unknownPoint.getDistanceFromAnotherPoint(knownPoint), 3);
+//               3 is power parameter
+                double distancePoweredToPowerParameter = pow(unknownPoint.getDistanceFromAnotherPoint(knownPoint), 3);
 
-                numerator += knownPoint.getTemperature() / dpp;
-                denominator += 1 / dpp;
+                numerator += knownPoint.getTemperature() / distancePoweredToPowerParameter;
+                denominator += 1 / distancePoweredToPowerParameter;
             }
 
             unknownPoint.setTemperature(numerator / denominator);
