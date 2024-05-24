@@ -31,6 +31,7 @@ bin/
 ### Mac OS ###
 .DS_Store
 
+*.jfr
 src/main/resources/databases/
 !src/main/resources/databases/true_data.csv
 src/main/resources/META-INF/

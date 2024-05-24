@@ -6,7 +6,7 @@ import java.util.concurrent.ExecutionException;
 import static br.ufrn.dimap.services.ExecutionService.*;
 import static br.ufrn.dimap.services.FileManagementService.defineExportationPath;
 
-public class VirtualThreadsECF {
+public class CompletableFuture {
     public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
         final long checkpoint1 = System.currentTimeMillis();
 
@@ -14,7 +14,7 @@ public class VirtualThreadsECF {
 
         final long checkpoint2 = System.currentTimeMillis();
 
-        var interpolationFutures = interpolateThroughVirtualThreadsAndCompletableFuture();
+        var interpolationFutures = interpolateThroughCompletableFuture();
 
         final long checkpoint3 = System.currentTimeMillis();
 

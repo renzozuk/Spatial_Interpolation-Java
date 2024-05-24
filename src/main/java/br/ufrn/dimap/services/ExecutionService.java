@@ -215,6 +215,20 @@ public class ExecutionService {
         return tasks;
     }
 
+    public static Set<Runnable> getInterpolationTasksUsingParallelStreams() {
+        return getInterpolationTasksUsingParallelStreams(Runtime.getRuntime().availableProcessors());
+    }
+
+    public static Set<Runnable> getInterpolationTasksUsingParallelStreams(int quantity) {
+        List<UnknownPoint> unknownPoints = getInstance().getUnknownPointsAsAList();
+
+        Set<Runnable> tasks = new HashSet<>();
+
+        IntStream.range(0, quantity).forEach(i -> tasks.add(() -> InterpolationService.assignTemperatureToUnknownPointsInParallel(unknownPoints.subList((int) Math.floor((double) unknownPoints.size() / quantity * i), (int) Math.floor((double) unknownPoints.size() / quantity * (i + 1))))));
+
+        return tasks;
+    }
+
     public static Set<Runnable> getInterpolationTasksPerUnknownPointsQuantity() {
         return getInstance().getUnknownPoints().stream().map(up -> (Runnable) () -> InterpolationService.assignTemperatureToUnknownPoint(up)).collect(Collectors.toUnmodifiableSet());
     }
@@ -237,22 +251,6 @@ public class ExecutionService {
         }
     }
 
-    public static Set<CompletableFuture<UnknownPoint>> interpolateThroughPlatformThreadsAndCompletableFuture() {
-        Set<CompletableFuture<UnknownPoint>> futures = new HashSet<>();
-
-        try(var executor = Executors.newFixedThreadPool(getRuntime().availableProcessors())){
-            getInstance().getUnknownPoints().forEach(up -> {
-                futures.add(CompletableFuture.supplyAsync(() -> {
-                    InterpolationService.assignTemperatureToUnknownPoint(up);
-
-                    return up;
-                }));
-            });
-        }
-
-        return futures;
-    }
-
     public static Set<Future<UnknownPoint>> interpolateThroughVirtualThreadsAndFuture() {
         try(var executionService = Executors.newVirtualThreadPerTaskExecutor()){
             Set<Future<UnknownPoint>> futureResult = new HashSet<>();
@@ -265,29 +263,27 @@ public class ExecutionService {
         }
     }
 
-    public static Set<CompletableFuture<UnknownPoint>> interpolateThroughVirtualThreadsAndCompletableFuture() {
-        Set<CompletableFuture<UnknownPoint>> futures = new HashSet<>();
-
-        try(var executor = Executors.newVirtualThreadPerTaskExecutor()){
-            getInstance().getUnknownPoints().forEach(up -> {
-                futures.add(CompletableFuture.supplyAsync(() -> {
-                    InterpolationService.assignTemperatureToUnknownPoint(up);
-
-                    return up;
-                }));
-            });
-
-            for(CompletableFuture<UnknownPoint> future : futures){
-                future.join();
-            }
-        }
-
-        return futures;
-    }
-
     public static void runInterpolationAction() {
         InterpolationAction interpolationAction = new InterpolationAction();
         interpolationAction.compute();
+    }
+
+    public static Set<CompletableFuture<UnknownPoint>> interpolateThroughCompletableFuture() {
+        Set<CompletableFuture<UnknownPoint>> futures = new HashSet<>();
+
+        getInstance().getUnknownPoints().forEach(up -> {
+            futures.add(CompletableFuture.supplyAsync(() -> {
+                InterpolationService.assignTemperatureToUnknownPoint(up);
+
+                return up;
+            }));
+        });
+
+        for(CompletableFuture<UnknownPoint> future : futures){
+            future.join();
+        }
+
+        return futures;
     }
 
     public static Runnable getExportationTask() {
@@ -312,20 +308,18 @@ public class ExecutionService {
         }
     }
 
-    public static Future<Void> exportThroughSingleThreadAndCompletableFuture() {
-        try(var executionService = Executors.newSingleThreadExecutor()){
-            CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
-                try {
-                    FileManagementService.exportInterpolations(getInstance().getUnknownPoints());
-                } catch (IOException | InterruptedException e) {
-                    throw new RuntimeException(e);
-                }
-            });
+    public static CompletableFuture<Void> exportThroughSingleThreadAndCompletableFuture() {
+        CompletableFuture<Void> future = CompletableFuture.runAsync(() -> {
+            try {
+                FileManagementService.exportInterpolations(getInstance().getUnknownPoints());
+            } catch (IOException | InterruptedException e) {
+                throw new RuntimeException(e);
+            }
+        });
 
-            future.join();
+        future.join();
 
-            return future;
-        }
+        return future;
     }
 
     public static void printResult(Collection<Future<String>> importationFutures, Collection<Future<UnknownPoint>> interpolationFutures, Collection<Future<UnknownPoint>> exportationFutures) throws ExecutionException, InterruptedException {
