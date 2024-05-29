@@ -31,7 +31,9 @@ bin/
 ### Mac OS ###
 .DS_Store
 
+*.jfr
 src/main/resources/databases/
 !src/main/resources/databases/true_data.csv
+src/main/resources/META-INF/
 src/main/resources/output/*
 !src/main/resources/output/exported_locations_2024.04.27-16.09.46.csv
