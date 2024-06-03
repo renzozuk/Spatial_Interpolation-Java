@@ -9,7 +9,7 @@ import static br.ufrn.dimap.services.ExecutionService.getInterpolationTaskUsingP
 import static br.ufrn.dimap.services.ExecutionService.runSerial;
 
 @State(Scope.Benchmark)
-public class SerialParallelStream {
+public class ParallelStream {
     @Setup
     public void loadDataset() throws IOException {
         FileManagementService.importRandomData();
