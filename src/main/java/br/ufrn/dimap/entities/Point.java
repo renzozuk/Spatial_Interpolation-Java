@@ -2,6 +2,12 @@ package br.ufrn.dimap.entities;
 
 import java.util.Objects;
 
+import static br.ufrn.dimap.util.Math.DEGREES_TO_RADIANS;
+import static java.lang.Math.atan2;
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+import static java.lang.Math.sqrt;
+
 public abstract class Point {
     private final double latitude;
     private final double longitude;
@@ -60,12 +66,13 @@ public abstract class Point {
             return 0.0;
         }
 
-        double latitudeDistance = point.getLatitude() * Math.PI / 180 - latitude * Math.PI / 180;
-        double longitudeDistance = point.getLongitude() * Math.PI / 180 - longitude * Math.PI / 180;
-        double a = Math.sin(latitudeDistance / 2) * Math.sin(latitudeDistance / 2) +
-                Math.cos(latitude * Math.PI / 180) * Math.cos(point.getLatitude() * Math.PI / 180) *
-                Math.sin(longitudeDistance / 2) * Math.sin(longitudeDistance / 2);
-//        6378.137 = earth radius
-        return 6378.137 * 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        double dLat = (point.getLatitude() - latitude) * DEGREES_TO_RADIANS;
+        double dLon = (point.getLongitude() - longitude) * DEGREES_TO_RADIANS;
+
+        double a = sin(dLat / 2.0) * sin(dLat / 2.0) +
+                cos(latitude * DEGREES_TO_RADIANS) * cos(point.getLatitude() * DEGREES_TO_RADIANS) *
+                sin(dLon / 2.0) * sin(dLon / 2.0);
+
+        return 12742.0 * atan2(sqrt(a), sqrt(1 - a));
     }
 }
