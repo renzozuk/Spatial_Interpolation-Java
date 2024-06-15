@@ -16,6 +16,7 @@ public class CompletableFuture {
     @Benchmark
     @Warmup(iterations = 5)
     @Measurement(iterations = 5)
+    @Fork(value = 2)
     public void execute() {
         interpolateThroughCompletableFuture();
     }

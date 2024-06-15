@@ -1,12 +1,7 @@
 package benchmark;
 
 import br.ufrn.dimap.services.FileManagementService;
-import org.openjdk.jmh.annotations.Benchmark;
-import org.openjdk.jmh.annotations.Measurement;
-import org.openjdk.jmh.annotations.Scope;
-import org.openjdk.jmh.annotations.Setup;
-import org.openjdk.jmh.annotations.State;
-import org.openjdk.jmh.annotations.Warmup;
+import org.openjdk.jmh.annotations.*;
 
 import java.io.IOException;
 
@@ -24,6 +19,7 @@ public class Serial {
     @Benchmark
     @Warmup(iterations = 5)
     @Measurement(iterations = 5)
+    @Fork(value = 2)
     public void execute() {
         runSerial(getInterpolationTasks());
     }

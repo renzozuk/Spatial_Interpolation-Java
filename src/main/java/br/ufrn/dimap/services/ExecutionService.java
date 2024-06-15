@@ -85,7 +85,7 @@ public class ExecutionService {
         }
     }
 
-    public static Set<Runnable> getImportationTasksForSerial() {
+    public static Set<Runnable> getImportationTasks() {
         Runnable importKnownPoints = () -> {
             try {
                 FileManagementService.importRandomData();

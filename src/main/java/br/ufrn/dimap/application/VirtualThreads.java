@@ -1,25 +1,22 @@
 package br.ufrn.dimap.application;
 
-import java.io.IOException;
-import java.util.concurrent.ExecutionException;
-
 import static br.ufrn.dimap.services.ExecutionService.*;
 import static br.ufrn.dimap.services.FileManagementService.defineExportationPath;
 
-public class CompletableFuture {
-    public static void main(String[] args) throws IOException, ExecutionException, InterruptedException {
+public class VirtualThreads {
+    public static void main(String[] args) throws InterruptedException {
         final long checkpoint1 = System.currentTimeMillis();
 
-        var importationFutures = importThroughCompletableFuture();
+        runVirtualThreads(getImportationTasks());
 
         final long checkpoint2 = System.currentTimeMillis();
 
-        var interpolationFutures = interpolateThroughCompletableFuture();
+        runVirtualThreads(getInterpolationTasks());
 
         final long checkpoint3 = System.currentTimeMillis();
 
         defineExportationPath();
-        var exportationFuture = exportThroughSingleThreadAndCompletableFuture();
+        runVirtualThreads(getExportationTask());
 
         final long checkpoint4 = System.currentTimeMillis();
 

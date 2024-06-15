@@ -42,6 +42,16 @@
             <artifactId>flightrecorder</artifactId>
             <version>9.0.0</version>
         </dependency>
+        <dependency>
+            <groupId>org.apache.jmeter</groupId>
+            <artifactId>ApacheJMeter_core</artifactId>
+            <version>5.1</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.jmeter</groupId>
+            <artifactId>ApacheJMeter_java</artifactId>
+            <version>5.1</version>
+        </dependency>
 
     </dependencies>
 

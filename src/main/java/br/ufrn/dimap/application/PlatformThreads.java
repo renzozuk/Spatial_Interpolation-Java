@@ -1,26 +1,23 @@
 package br.ufrn.dimap.application;
 
-import static br.ufrn.dimap.services.ExecutionService.getExportationTask;
-import static br.ufrn.dimap.services.ExecutionService.getImportationTasksForSerial;
+import static br.ufrn.dimap.services.ExecutionService.*;
 import static br.ufrn.dimap.services.ExecutionService.printResult;
-import static br.ufrn.dimap.services.ExecutionService.runInterpolationAction;
-import static br.ufrn.dimap.services.ExecutionService.runSerial;
 import static br.ufrn.dimap.services.FileManagementService.defineExportationPath;
 
-public class ForkJoin {
-    public static void main(String[] args) {
+public class PlatformThreads {
+    public static void main(String[] args) throws InterruptedException {
         final long checkpoint1 = System.currentTimeMillis();
 
-        runSerial(getImportationTasksForSerial());
+        runPlatformThreads(getImportationTasks());
 
         final long checkpoint2 = System.currentTimeMillis();
 
-        runInterpolationAction();
+        runPlatformThreads(getInterpolationTasks());
 
         final long checkpoint3 = System.currentTimeMillis();
 
         defineExportationPath();
-        runSerial(getExportationTask());
+        runPlatformThreads(getExportationTask());
 
         final long checkpoint4 = System.currentTimeMillis();
 

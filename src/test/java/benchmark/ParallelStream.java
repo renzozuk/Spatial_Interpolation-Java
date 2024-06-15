@@ -19,6 +19,7 @@ public class ParallelStream {
     @Benchmark
     @Warmup(iterations = 5)
     @Measurement(iterations = 5)
+    @Fork(value = 2)
     public void execute() {
         runSerial(getInterpolationTaskUsingParallelStreams());
     }
