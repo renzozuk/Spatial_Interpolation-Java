@@ -282,13 +282,13 @@ public class ExecutionService {
 
     public static Set<Future<UnknownPoint>> interpolateThroughVirtualThreadsAndCallable() {
         try(var executionService = Executors.newVirtualThreadPerTaskExecutor()){
-            Set<Future<UnknownPoint>> futureResult = new HashSet<>();
+            Set<Future<UnknownPoint>> futures = new HashSet<>();
 
             for(UnknownPoint unknownPoint : getInstance().getUnknownPoints()){
-                futureResult.add(executionService.submit(InterpolationService.getInterpolationCallable(unknownPoint)));
+                futures.add(executionService.submit(InterpolationService.getInterpolationCallable(unknownPoint)));
             }
 
-            return futureResult;
+            return futures;
         }
     }
 
