@@ -105,50 +105,6 @@ public class ExecutionService {
         return Set.of(importKnownPoints, importUnknownPoints);
     }
 
-    public static Set<Runnable> getMutexVersionOfImportationTasksForThreads() {
-        Lock lock = new ReentrantLock();
-
-        Runnable importKnownPoints = () -> {
-            try {
-                FileManagementService.importRandomData(lock);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        };
-
-        Runnable importUnknownPoints = () -> {
-            try {
-                FileManagementService.importUnknownLocations(lock);
-            } catch (IOException e) {
-                throw new RuntimeException(e);
-            }
-        };
-
-        return Set.of(importKnownPoints, importUnknownPoints);
-    }
-
-    public static Set<Runnable> getSemaphoreVersionOfImportationTasksForThreads() {
-        Semaphore semaphore = new Semaphore(1);
-
-        Runnable importKnownPoints = () -> {
-            try {
-                FileManagementService.importRandomData(semaphore);
-            } catch (IOException | InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        };
-
-        Runnable importUnknownPoints = () -> {
-            try {
-                FileManagementService.importUnknownLocations(semaphore);
-            } catch (IOException | InterruptedException e) {
-                throw new RuntimeException(e);
-            }
-        };
-
-        return Set.of(importKnownPoints, importUnknownPoints);
-    }
-
     public static Set<Future<String>> importThroughSingleThreadAndCallable() {
         try(var executionService = Executors.newSingleThreadExecutor()){
             Set<Future<String>> futures = new HashSet<>();
@@ -206,7 +162,7 @@ public class ExecutionService {
     }
 
     public static Set<Runnable> getInterpolationTasks(int quantity) {
-        List<UnknownPoint> unknownPoints = getInstance().getUnknownPointsAsAList();
+        List<UnknownPoint> unknownPoints = getInstance().getUnknownPointsAsList();
 
         Set<Runnable> tasks = new HashSet<>();
 
@@ -220,7 +176,7 @@ public class ExecutionService {
     }
 
     public static Set<Runnable> getInterpolationTasksUsingParallelStreams(int quantity) {
-        List<UnknownPoint> unknownPoints = getInstance().getUnknownPointsAsAList();
+        List<UnknownPoint> unknownPoints = getInstance().getUnknownPointsAsList();
 
         Set<Runnable> tasks = new HashSet<>();
 

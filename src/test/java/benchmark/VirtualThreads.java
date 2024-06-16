@@ -6,10 +6,10 @@ import org.openjdk.jmh.annotations.*;
 import java.io.IOException;
 
 import static br.ufrn.dimap.services.ExecutionService.getInterpolationTasks;
-import static br.ufrn.dimap.services.ExecutionService.runPlatformThreads;
+import static br.ufrn.dimap.services.ExecutionService.runVirtualThreads;
 
 @State(Scope.Benchmark)
-public class PlatformThreadsMutex {
+public class VirtualThreads {
     @Setup
     public void loadDataset() throws IOException {
         FileManagementService.importRandomData();
@@ -21,6 +21,6 @@ public class PlatformThreadsMutex {
     @Measurement(iterations = 5)
     @Fork(value = 2)
     public void execute() throws InterruptedException {
-        runPlatformThreads(getInterpolationTasks());
+        runVirtualThreads(getInterpolationTasks());
     }
 }

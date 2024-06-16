@@ -17,7 +17,7 @@ public class InterpolationAction extends RecursiveAction {
     private static final Logger logger = Logger.getAnonymousLogger();
 
     public InterpolationAction() {
-        this.unknownPoints = LocationRepository.getInstance().getUnknownPointsAsAList();
+        this.unknownPoints = LocationRepository.getInstance().getUnknownPointsAsList();
         this.subListsQuantity = 0;
     }
 
