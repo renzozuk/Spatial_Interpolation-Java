@@ -5,11 +5,10 @@ import org.openjdk.jmh.annotations.*;
 
 import java.io.IOException;
 
-import static br.ufrn.dimap.services.ExecutionService.getInterpolationTasks;
-import static br.ufrn.dimap.services.ExecutionService.runSerial;
+import static br.ufrn.dimap.services.ExecutionService.*;
 
 @State(Scope.Benchmark)
-public class Serial {
+public class VirtualThreadsMutexE {
     @Setup
     public void loadDataset() throws IOException {
         FileManagementService.importRandomData();
@@ -20,7 +19,7 @@ public class Serial {
     @Warmup(iterations = 1)
     @Measurement(iterations = 5)
     @Fork(value = 2)
-    public void execute() {
-        runSerial(getInterpolationTasks());
+    public void execute() throws InterruptedException {
+        runVirtualThreadsUsingExecutor(getInterpolationTasksPerUnknownPointsQuantity());
     }
 }

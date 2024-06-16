@@ -5,11 +5,10 @@ import org.openjdk.jmh.annotations.*;
 
 import java.io.IOException;
 
-import static br.ufrn.dimap.services.ExecutionService.getInterpolationTasksUsingParallelStreams;
-import static br.ufrn.dimap.services.ExecutionService.runPlatformThreads;
+import static br.ufrn.dimap.services.ExecutionService.*;
 
 @State(Scope.Benchmark)
-public class PlatformThreadsMutexParallelStream {
+public class PlatformThreadsMutexE {
     @Setup
     public void loadDataset() throws IOException {
         FileManagementService.importRandomData();
@@ -17,9 +16,10 @@ public class PlatformThreadsMutexParallelStream {
     }
 
     @Benchmark
-    @Warmup(iterations = 5)
+    @Warmup(iterations = 1)
     @Measurement(iterations = 5)
+    @Fork(value = 2)
     public void execute() throws InterruptedException {
-        runPlatformThreads(getInterpolationTasksUsingParallelStreams());
+        runPlatformThreadsUsingExecutor(getInterpolationTasksPerUnknownPointsQuantity());
     }
 }

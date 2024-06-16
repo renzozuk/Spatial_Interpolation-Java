@@ -26,7 +26,7 @@ public class ExecutionService {
     }
 
     public static void runPlatformThreads(Runnable task) throws InterruptedException {
-        Thread uniqueThread = Thread.ofPlatform().name(task.getClass().getSimpleName().split("/")[1]).start(task);
+        Thread uniqueThread = Thread.ofPlatform().name(task.getClass().getSimpleName()).start(task);
         uniqueThread.join();
     }
 
@@ -35,7 +35,7 @@ public class ExecutionService {
     }
 
     public static void runPlatformThreads(Collection<Runnable> tasks, int priority) throws InterruptedException {
-        for(Thread thread : tasks.stream().map(r -> Thread.ofPlatform().name(r.getClass().getSimpleName().split("/")[1]).start(r)).collect(Collectors.toUnmodifiableSet())){
+        for(Thread thread : tasks.stream().map(r -> Thread.ofPlatform().name(r.getClass().getSimpleName()).start(r)).collect(Collectors.toUnmodifiableSet())){
             thread.setPriority(priority);
             thread.join();
         }
@@ -56,7 +56,7 @@ public class ExecutionService {
     }
 
     public static void runVirtualThreads(Runnable task) throws InterruptedException {
-        Thread uniqueThread = Thread.ofVirtual().name(task.getClass().getSimpleName().split("/")[1]).start(task);
+        Thread uniqueThread = Thread.ofVirtual().name(task.getClass().getSimpleName()).start(task);
         uniqueThread.join();
     }
 
@@ -65,7 +65,7 @@ public class ExecutionService {
     }
 
     public static void runVirtualThreads(Collection<Runnable> tasks, int priority) throws InterruptedException {
-        for(Thread thread : tasks.stream().map(r -> Thread.ofVirtual().name(r.getClass().getSimpleName().split("/")[1]).start(r)).collect(Collectors.toUnmodifiableSet())){
+        for(Thread thread : tasks.stream().map(r -> Thread.ofVirtual().name(r.getClass().getSimpleName()).start(r)).collect(Collectors.toUnmodifiableSet())){
             thread.setPriority(priority);
             thread.join();
         }
@@ -82,6 +82,35 @@ public class ExecutionService {
             for(Runnable task : tasks){
                 executorService.submit(task);
             }
+        }
+    }
+
+    public static void runStructuredConcurrency(Runnable task) throws InterruptedException {
+        try(var taskScope = new StructuredTaskScope<>()){
+            taskScope.fork(() -> task);
+
+            taskScope.join();
+        }
+    }
+
+    public static void runStructuredConcurrency(Collection<Runnable> tasks) {
+        try(var taskScope = new StructuredTaskScope<>()){
+            Set<StructuredTaskScope.Subtask<Object>> subtasks = new HashSet<>();
+
+            for(Runnable task : tasks){
+                subtasks.add(taskScope.fork(() -> {
+                    task.run();
+
+                    return null;
+                }));
+            }
+            taskScope.join();
+
+            for(StructuredTaskScope.Subtask<Object> subtask : subtasks){
+                subtask.get();
+            }
+        }catch(Exception e){
+            e.printStackTrace();
         }
     }
 
@@ -206,7 +235,7 @@ public class ExecutionService {
     }
 
     public static Set<Runnable> getInterpolationTasks(int quantity) {
-        List<UnknownPoint> unknownPoints = getInstance().getUnknownPointsAsAList();
+        List<UnknownPoint> unknownPoints = getInstance().getUnknownPointsAsList();
 
         Set<Runnable> tasks = new HashSet<>();
 
@@ -220,7 +249,7 @@ public class ExecutionService {
     }
 
     public static Set<Runnable> getInterpolationTasksUsingParallelStreams(int quantity) {
-        List<UnknownPoint> unknownPoints = getInstance().getUnknownPointsAsAList();
+        List<UnknownPoint> unknownPoints = getInstance().getUnknownPointsAsList();
 
         Set<Runnable> tasks = new HashSet<>();
 
@@ -239,7 +268,7 @@ public class ExecutionService {
         };
     }
 
-    public static Set<Future<UnknownPoint>> interpolateThroughPlatformThreadsAndFuture() {
+    public static Set<Future<UnknownPoint>> interpolateThroughPlatformThreadsAndCallable() {
         try(var executionService = Executors.newFixedThreadPool(getRuntime().availableProcessors())){
             Set<Future<UnknownPoint>> futures = new HashSet<>();
 
@@ -251,7 +280,7 @@ public class ExecutionService {
         }
     }
 
-    public static Set<Future<UnknownPoint>> interpolateThroughVirtualThreadsAndFuture() {
+    public static Set<Future<UnknownPoint>> interpolateThroughVirtualThreadsAndCallable() {
         try(var executionService = Executors.newVirtualThreadPerTaskExecutor()){
             Set<Future<UnknownPoint>> futureResult = new HashSet<>();
 

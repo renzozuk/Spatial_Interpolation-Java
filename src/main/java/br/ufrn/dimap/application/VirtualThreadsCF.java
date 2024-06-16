@@ -2,11 +2,11 @@ package br.ufrn.dimap.application;
 
 import static br.ufrn.dimap.services.ExecutionService.exportThroughSingleThreadAndCallable;
 import static br.ufrn.dimap.services.ExecutionService.importThroughSingleThreadAndCallable;
-import static br.ufrn.dimap.services.ExecutionService.interpolateThroughVirtualThreadsAndFuture;
+import static br.ufrn.dimap.services.ExecutionService.interpolateThroughVirtualThreadsAndCallable;
 import static br.ufrn.dimap.services.ExecutionService.printResult;
 import static br.ufrn.dimap.services.FileManagementService.defineExportationPath;
 
-public class VirtualThreadsEF {
+public class VirtualThreadsCF {
     public static void main(String[] args) {
         final long checkpoint1 = System.currentTimeMillis();
 
@@ -14,7 +14,7 @@ public class VirtualThreadsEF {
 
         final long checkpoint2 = System.currentTimeMillis();
 
-        var interpolationFutures = interpolateThroughVirtualThreadsAndFuture();
+        var interpolationFutures = interpolateThroughVirtualThreadsAndCallable();
 
         final long checkpoint3 = System.currentTimeMillis();
 
