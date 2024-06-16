@@ -13,7 +13,7 @@ import java.util.stream.IntStream;
 
 public class ExecutionService {
     public static void runPlatformThreads(Runnable task) throws InterruptedException {
-        Thread uniqueThread = Thread.ofPlatform().name(task.getClass().getSimpleName().split("/")[1]).start(task);
+        Thread uniqueThread = Thread.ofPlatform().name(task.getClass().getSimpleName()).start(task);
         uniqueThread.join();
     }
 
@@ -22,14 +22,14 @@ public class ExecutionService {
     }
 
     public static void runPlatformThreads(Collection<Runnable> tasks, int priority) throws InterruptedException {
-        for(Thread thread : tasks.stream().map(r -> Thread.ofPlatform().name(r.getClass().getSimpleName().split("/")[1]).start(r)).collect(Collectors.toUnmodifiableSet())){
+        for(Thread thread : tasks.stream().map(r -> Thread.ofPlatform().name(r.getClass().getSimpleName()).start(r)).collect(Collectors.toUnmodifiableSet())){
             thread.setPriority(priority);
             thread.join();
         }
     }
 
     public static void runVirtualThreads(Runnable task) throws InterruptedException {
-        Thread uniqueThread = Thread.ofVirtual().name(task.getClass().getSimpleName().split("/")[1]).start(task);
+        Thread uniqueThread = Thread.ofVirtual().name(task.getClass().getSimpleName()).start(task);
         uniqueThread.join();
     }
 
@@ -38,7 +38,7 @@ public class ExecutionService {
     }
 
     public static void runVirtualThreads(Collection<Runnable> tasks, int priority) throws InterruptedException {
-        for(Thread thread : tasks.stream().map(r -> Thread.ofVirtual().name(r.getClass().getSimpleName().split("/")[1]).start(r)).collect(Collectors.toUnmodifiableSet())){
+        for(Thread thread : tasks.stream().map(r -> Thread.ofVirtual().name(r.getClass().getSimpleName()).start(r)).collect(Collectors.toUnmodifiableSet())){
             thread.setPriority(priority);
             thread.join();
         }
@@ -89,7 +89,7 @@ public class ExecutionService {
     }
 
     public static Set<Runnable> getInterpolationTasks(int quantity) {
-        List<UnknownPoint> unknownPoints = LocationRepository.getInstance().getUnknownPointsAsAList();
+        List<UnknownPoint> unknownPoints = LocationRepository.getInstance().getUnknownPointsAsList();
 
         Set<Runnable> tasks = new HashSet<>();
 

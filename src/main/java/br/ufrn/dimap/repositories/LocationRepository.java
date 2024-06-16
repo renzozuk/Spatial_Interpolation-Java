@@ -28,7 +28,7 @@ public class LocationRepository {
         return knownPoints.iterator();
     }
 
-    public List<KnownPoint> getKnownPointsAsAList() {
+    public List<KnownPoint> getKnownPointsAsList() {
         return knownPoints.stream().toList();
     }
 
@@ -36,7 +36,7 @@ public class LocationRepository {
         return unknownPoints.stream().collect(Collectors.toUnmodifiableSet());
     }
 
-    public List<UnknownPoint> getUnknownPointsAsAList() {
+    public List<UnknownPoint> getUnknownPointsAsList() {
         return unknownPoints.stream().toList();
     }
 

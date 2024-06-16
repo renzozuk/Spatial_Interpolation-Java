@@ -33,7 +33,7 @@ public class InterpolationService {
         double numerator = 0.0;
         double denominator = 0.0;
 
-        for(KnownPoint knownPoint : LocationRepository.getInstance().getKnownPointsAsAList()){
+        for(KnownPoint knownPoint : LocationRepository.getInstance().getKnownPointsAsList()){
             double dpp = pow(unknownPoint.getDistanceFromAnotherPoint(knownPoint), 3);
 
             numerator += knownPoint.getTemperature() / dpp;
